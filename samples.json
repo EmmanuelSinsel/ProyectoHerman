@@ -1,0 +1,118 @@
+//-----------LIBRARY
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------ADMIN
+//--INSERT
+{
+  "user":"emmanuel",
+  "password":"1234567890",
+  "first_name":"emmanuel",
+  "last_name":"sinsel",
+  "phone":"6681342312",
+  "email":"sinsel@gmail.com",
+  "state": 1
+}
+//--UPDATE
+{
+  "user":"emmanuel",
+  "password":"1234567890",
+  "first_name":"emmanuel",
+  "last_name":"sinsel",
+  "phone":"6681342312",
+  "email":"sinsel13@gmail.com",
+  "state":"1"
+}
+//--DELETE
+{
+  "email":"sinsel123123@gmail.com"
+}
+//--LIST
+{
+  "where":"email='sinsel123123@gmail.com'"
+}
+//-----------ALUMN
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------ADVICE
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------BOOK
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------BOOK_NOTATIONS
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------FAVORITE
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------COMMENTARY
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------AUTHOR
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------CATEGORY
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
+
+//-----------RESERVES
+//--INSERT
+
+//--UPDATE
+
+//--DELETE
+
+//--LIST
