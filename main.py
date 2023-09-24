@@ -1,204 +1,172 @@
-#CONEXION SQL
+# CONEXION SQL
 from SQLConnection import SQLConnector
-con = SQLConnector(host="localhost",
-                     db="biblioteca",
-                   port="3306",
-                   user="root",
-               password="piedras123.")
+con = SQLConnector(host="localhost", db="biblioteca", port="3306", user="root", password="piedras123.")
 con.connect()
 
-#PROCESADOR DE JSONS
+# PROCESADOR DE JSONS
 from JSONconverter import JSONtoLIST
 converter = JSONtoLIST()
 
-#MODELOS
+# MODELOS
 import models
 
-#API
-#pip install fastapi
-#pip install uvicorn
+# API
+# pip install fastapi
+# pip install uvicorn
 from fastapi import FastAPI, Request
 app = FastAPI()
 
-#HELPERS
+# PAGINAS
+import pages.Admin as Admin  # TODAS IMPLEMENTADAS, TODAS FUNCIONANDO
+import pages.Alumn as Alumn  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Author as Author  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Book as Book  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Category as Category  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Favorite as Favorite  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Library as Library  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Reserve as Reserve  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Transaction as Transaction  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
 
-def repeated(table, field, value):
-    sentence = field + "='"+value+"'"
-    status, msg = con.repeated(table=table,
-                               where=sentence)
-    return status
-#ADMINS
+# ADMINS----------------------------------------------------------------------------------------------------------------
 @app.post("/insert_admin")
-def insert_admin(request: models.Admin):
-    res = request.dict()
-    if(repeated("ADMIN","email", res['email'])==1):
-        fields, values = converter.insert(request)
-        status, msg = con.insert(table="ADMIN",
-                                fields=fields,
-                                 values=values)
-        return {"message": msg,"status":status}
-    else:
-        return {"message": "Email already registered","status":2}
-
+async def insert_admin(request: models.Admin):
+    return Admin.insert_admin(request)
 @app.post("/update_admin")
-def update_admin(request: models.Admin):
-    res = request.dict()
-    values = converter.update(request)
-    status, msg = con.update(table="ADMIN",
-                             values=values,
-                             where="email='"+res['email']+"'")
-    return {"message": msg,"status":status}
-
+async def update_admin(request: models.Admin):
+    return Admin.update_admin(request)
 @app.post("/delete_admin")
 async def delete_admin(request: Request):
-    res = await request.json()
-    print(res)
-    status, msg = con.update(table="ADMIN",
-                             values=["state = 0"],
-                             where="email='"+res['email']+"'")
-    return {"message": msg,"status":status}
-
+    return Admin.delete_admin(request)
 @app.post("/list_admin")
 async def list_admin(request: Request):
-    res = await request.json()
-    status, res = con.select(table="ADMIN",
-                             where=res['where'])
-    return res
+    return await Admin.list_admin(request)
 
-#ALUMNOS
+# ALUMNOS---------------------------------------------------------------------------------------------------------------
 @app.post("/insert_alumn")
-def insert_alumn(request: Request):
-    return request
-
+async def insert_alumn(request: Request):
+    return await Alumn.insert_alumn(request)
 @app.post("/update_alumn")
-def update_alumn(request: Request):
-    return request
-
+async def update_alumn(request: Request):
+    return await Alumn.update_alumn(request)
 @app.post("/delete_alumn")
-def delete_alumn(request: Request):
-    return request
-
+async def delete_alumn(request: Request):
+    return await Alumn.delete_alumn(request)
 @app.post("/list_alumn")
-def list_alumn(request: Request):
-    return request
-
+async def list_alumn(request: Request):
+    return await Alumn.list_alumn(request)
 @app.post("/advice_alumn")
-def advice_alumn(request: Request):
-    return request
-
+async def advice_alumn(request: Request):
+    return await Alumn.advice_alumn(request)
 @app.post("/historial_alumn")
-def historial_alumn(request: Request):
-    return request
-
+async def historial_alumn(request: Request):
+    return await Alumn.historial_alumn(request)
 @app.post("/profile_alumn")
-def profile_alumn(request: Request):
-    return request
+async def profile_alumn(request: Request):
+    return await Alumn.profile_alumn(request)
 
-#LIBROS
+# LIBROS----------------------------------------------------------------------------------------------------------------
 @app.post("/insert_book")
-def insert_book(request: Request):
-    return request
-
+async def insert_book(request: Request):
+    return await Book.insert_book(request)
 @app.post("/update_book")
-def update_book(request: Request):
-    return request
-
+async def update_book(request: Request):
+    return await Book.update_book(request)
 @app.post("/delete_book")
-def delete_book(request: Request):
-    return request
-
+async def delete_book(request: Request):
+    return await Book.delete_book(request)
 @app.post("/list_book")
-def list_book(request: Request):
-    return request
-
+async def list_book(request: Request):
+    return await Book.list_book(request)
 @app.post("/comment_book")
-def comment_book(request: Request):
-    return request
+async def comment_book(request: Request):
+    return await Book.comment_book(request)
 
-#AUTORES
+# AUTORES---------------------------------------------------------------------------------------------------------------
 @app.post("/insert_author")
-def insert_author(request: Request):
-    return request
-
+async def insert_author(request: Request):
+    return await Author.insert_author(request)
 @app.post("/update_author")
-def update_author(request: Request):
-    return request
-
+async def update_author(request: Request):
+    return await Author.update_author(request)
 @app.post("/delete_author")
-def delete_author(request: Request):
-    return request
-
+async def delete_author(request: Request):
+    return await Author.delete_author(request)
 @app.post("/list_author")
-def list_author(request: Request):
-    return request
+async def list_author(request: Request):
+    return await Author.list_author(request)
 
-#GENEROS
+# CATEGORIAS------------------------------------------------------------------------------------------------------------
 @app.post("/insert_category")
-def insert_category(request: Request):
-    return request
-
+async def insert_category(request: Request):
+    return await Category.insert_category(request)
 @app.post("/update_category")
-def update_category(request: Request):
-    return request
-
+async def update_category(request: Request):
+    return await Category.update_category(request)
 @app.post("/delete_category")
-def delete_category(request: Request):
-    return request
+async def delete_category(request: Request):
+    return await Category.delete_category(request)
 
 @app.post("/list_category")
-def list_category(request: Request):
-    return request
+async def list_category(request: Request):
+    return await Category.list_category(request)
 
-#FAVORITOS
+# FAVORITOS-------------------------------------------------------------------------------------------------------------
 @app.post("/add_favorite")
-def add_favorite(request: Request):
-    return request
+async def add_favorite(request: Request):
+    return await Favorite.add_favorite(request)
 
-#PRESTAMOS
+# BIBLIOTECAS-----------------------------------------------------------------------------------------------------------
+@app.post("/insert_library")
+async def insert_library(request: Request):
+    return await Library.insert_library(request)
+@app.post("/update_library")
+async def update_library(request: Request):
+    return await Library.update_library(request)
+@app.post("/delete_library")
+async def delete_library(request: Request):
+    return await Library.delete_library(request)
+@app.post("/list_library")
+async def list_library(request: Request):
+    return await Library.list_library(request)
+# PRESTAMOS-------------------------------------------------------------------------------------------------------------
 @app.post("/insert_rental")
-def insert_rental(request: Request):
-    return request
-
+async def insert_rental(request: Request):
+    return await Transaction.insert_rental(request)
 @app.post("/update_rental")
-def update_rental(request: Request):
-    return request
-
+async def update_rental(request: Request):
+    return await Transaction.update_rental(request)
 @app.post("/delete_rental")
-def delete_rental(request: Request):
-    return request
-
+async def delete_rental(request: Request):
+    return await Transaction.delete_rental(request)
 @app.post("/list_rental")
-def list_rental(request: Request):
-    return request
+async def list_rental(request: Request):
+    return await Transaction.list_rental(request)
 
-#APARTADOS
+# APARTADOS-------------------------------------------------------------------------------------------------------------
 @app.post("/insert_reserve")
-def insert_reserve(request: Request):
-    return request
-
+async def insert_reserve(request: Request):
+    return await Reserve.insert_reserve(request)
 @app.post("/update_reserve")
-def update_reserve(request: Request):
-    return request
-
+async def update_reserve(request: Request):
+    return await Reserve.update_reserve(request)
 @app.post("/delete_reserve")
-def delete_reserve(request: Request):
-    return request
-
+async def delete_reserve(request: Request):
+    return await Reserve.delete_reserve(request)
 @app.post("/list_reserve")
-def list_reserve(request: Request):
-    return request
+async def list_reserve(request: Request):
+    return await Reserve.list_reserve(request)
 
 #RECOMENDACIONES
 @app.post("/get_recomendations")
-def get_recomendations(request: Request):
+async def get_recomendations(request: Request):
     return request
 
 #ESTADISTICAS
 @app.post("/get_statistics")
-def get_statistics(request: Request):
+async def get_statistics(request: Request):
     return request
 
 #AUTOMATIZADOS
 @app.post("/daily_deadline_check")
-def daily_deadline_check(request: Request):
+async def daily_deadline_check(request: Request):
     return request

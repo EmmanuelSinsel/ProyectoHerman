@@ -28,7 +28,6 @@ class SQLConnector:
     #JALA AL 100
     def delete(self, table, where):
         query = "DELETE FROM "+ table +" WHERE " + where
-        print(query)
         self.cursor.execute(query)
         self.connection.commit()
         if self.cursor.rowcount >= 1:
@@ -39,7 +38,6 @@ class SQLConnector:
     def insert(self, table, fields, values):
         cursors = ""
         for i in values:
-            print(type(i))
             if type(i) is str:
                 cursors += "%s, "
             if type(i) is float:
@@ -49,7 +47,6 @@ class SQLConnector:
         cursors = cursors[:-2]
         try:
             query = "INSERT INTO " + table + " (" + fields + ") VALUES (" + cursors + ")"
-            print(query)
             self.cursor.execute(query, values)
             self.connection.commit()
             if self.cursor.rowcount >= 1:
@@ -66,7 +63,6 @@ class SQLConnector:
             sets += i+", "
         sets = sets[:-2]
         query = "UPDATE " + table + " SET " + sets + " WHERE "+ where
-        print(query)
         self.cursor.execute(query)
         self.connection.commit()
         if self.cursor.rowcount >= 1:
@@ -89,11 +85,9 @@ class SQLConnector:
 
     def repeated(self, table, where):
         query = "SELECT COUNT(*) FROM "+ table +" WHERE "+where+""
-        print(query)
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         row_count = result[0]
-        print("rows "+str(row_count))
         if(row_count > 0):
             return 0, "Repeated" #REPEATED
         if(row_count == 0):

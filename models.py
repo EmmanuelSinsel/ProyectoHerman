@@ -1,10 +1,11 @@
 from pydantic import BaseModel
 
 class Library(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    name: str | None = None
+    address: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    state: str | None = None
 
 class Admin(BaseModel):
     user: str | None = None
@@ -15,64 +16,70 @@ class Admin(BaseModel):
     email: str | None = None
     state: str | None = None
 
-    where: str  | None = None
-
 class Alumn(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    account_number: str | None = None
+    user: str | None = None
+    password: str | None = None
+    school_group: str | None = None
+    carreer: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    last_preference: str | None = None
+    state : str | None = None
 
 class Advice(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    id_alumn: str | None = None
+    message: str | None = None
+    state: str | None = None
 
 class Book(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    tittle: str | None = None
+    id_category: str | None = None
+    id_author: str | None = None
+    status: str | None = None
+    image: str | None = None
+    id_library: str | None = None
+    state: str | None = None
 
 class Book_Notation(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    id_book: str | None = None
+    message: str | None = None
+    state: str | None = None
 
 class Favorite(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    id_alumn: str | None = None
+    id_book: str | None = None
+    state: str | None = None
 
 class Commentary(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    id_alumn: str | None = None
+    id_book: str | None = None
+    message: str | None = None
+    state: str | None = None
 
 class Author(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    name: str | None = None
+    state : str | None = None
 
 class Category(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    category: str | None = None
+    state: str | None = None
 
 class Transaction(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    id_alumn: str | None = None
+    id_book: str | None = None
+    date_transaction: str | None = None
+    date_deadline: str | None = None
+    date_return: str | None = None
+    notation: str | None = None
+    id_library: str | None = None
+    state: str | None = None
 
 class Reserve(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    id_alumn: str | None = None
+    id_book: str | None = None
+    date_pickup: str | None = None
+    id_library: str | None = None
+    state: str | None = None
