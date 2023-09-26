@@ -29,7 +29,17 @@ import pages.Favorite as Favorite  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
 import pages.Library as Library  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
 import pages.Reserve as Reserve  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
 import pages.Transaction as Transaction  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
+import pages.Auth as Auth
 
+# AUTENTICACION---------------------------------------------------------------------------------------------------------
+
+@app.post("/login")
+async def login(request: Request):
+    return Auth.login(request)
+
+@app.post("/logout")
+async def logout(request: Request):
+    return Auth.logout(request)
 
 # ADMINS----------------------------------------------------------------------------------------------------------------
 @app.post("/insert_admin")

@@ -4,6 +4,8 @@ import models
 
 table = "ADMIN"
 
+
+
 #ADMINS
 def insert_admin(request: models.Admin):
     res = request.dict()

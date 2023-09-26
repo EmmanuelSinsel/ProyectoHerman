@@ -1,3 +1,13 @@
+//-----------LOGIN
+//type 1 = Admin, type 0 = Alumn
+{
+  "type": "1",
+  "data": {
+      "email":"sinsel@gmail.com",
+      "password":"1234567890"
+  }
+}
+
 //-----------LIBRARY
 //--INSERT
 

@@ -1,7 +1,6 @@
 import mysql
 from mysql.connector import Error
 class SQLConnector:
-
     connection = mysql.connector
     cursor: None
     SQL_HOST = ""

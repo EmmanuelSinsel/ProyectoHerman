@@ -2,7 +2,8 @@ from main import con, converter
 from helpers import repeated
 import models
 
-table="ALUMN"
+table = "ALUMN"
+
 
 def insert_alumn(request):
     res = request.dict()
