@@ -15,7 +15,9 @@ import models
 # API
 # pip install fastapi
 # pip install uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header
+from fastapi.responses import JSONResponse
+from typing import Annotated
 
 app = FastAPI()
 
@@ -31,21 +33,42 @@ import pages.Reserve as Reserve  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
 import pages.Transaction as Transaction  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
 import pages.Auth as Auth
 
+# TRIGGER DE AUTENTICACION----------------------------------------------------------------------------------------------
+@app.middleware("http")
+async def Middleware(request: Request, call_next):
+    headers = dict(request.scope['headers'])
+    try:
+        token = bytes.decode(headers[b'token'])
+        if(token == ""):
+            print("Not logged")
+            response = {"status": "600", "msg": "Not logged"}
+            return JSONResponse(content=response)
+        elif(Auth.Authenticate(token)):
+            print("Authenticated: "+ token)
+            response = await call_next(request)
+            return response
+        else:
+            print("Invalid token")
+            response = {"status": "500", "msg": "Invalid token"}
+            return JSONResponse(content=response)
+    except:
+        return response
+
 # AUTENTICACION---------------------------------------------------------------------------------------------------------
 
 @app.post("/login")
 async def login(request: Request):
-    return Auth.login(request)
+    return await Auth.login(request)
 
 @app.post("/logout")
 async def logout(request: Request):
-    return Auth.logout(request)
+    return await Auth.logout(request)
 
 # ADMINS----------------------------------------------------------------------------------------------------------------
 @app.post("/insert_admin")
-async def insert_admin(request: models.Admin):
+async def insert_admin(request: models.Admin, token: str = Header(None)):
+    print(token)
     return Admin.insert_admin(request)
-
 
 @app.post("/update_admin")
 async def update_admin(request: models.Admin):

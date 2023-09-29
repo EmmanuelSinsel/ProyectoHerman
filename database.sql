@@ -1,3 +1,17 @@
+CREATE TABLE LOG(
+    id_log BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_user BIGINT NOT NULL,
+    log VARCHAR(100) NOT NULL
+)
+
+CREATE TABLE TOKEN(
+    id_token BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_user BIGINT NOT NULL,
+    type_user varchar(1) NOT NULL,
+    token varchar(50) NOT NULL,
+    expiration_date DATE NOT NULL
+)
+
 CREATE TABLE LIBRARY(
     id_library BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,

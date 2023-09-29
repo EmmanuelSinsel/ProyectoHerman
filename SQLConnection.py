@@ -1,3 +1,5 @@
+import datetime
+
 import mysql
 from mysql.connector import Error
 class SQLConnector:
@@ -37,15 +39,19 @@ class SQLConnector:
     def insert(self, table, fields, values):
         cursors = ""
         for i in values:
+            print(type(i))
             if type(i) is str:
                 cursors += "%s, "
             if type(i) is float:
                 cursors += "%f, "
             if type(i) is int:
                 cursors += "%i, "
+            if type(i) is datetime.date:
+                cursors += "'%s', "
         cursors = cursors[:-2]
         try:
             query = "INSERT INTO " + table + " (" + fields + ") VALUES (" + cursors + ")"
+            print(query)
             self.cursor.execute(query, values)
             self.connection.commit()
             if self.cursor.rowcount >= 1:
@@ -75,7 +81,9 @@ class SQLConnector:
             query = "SELECT * FROM "+ table +" WHERE "+where
         else:
             query = "SELECT * FROM " + table
+        print(query)
         self.cursor.execute(query)
+        print(self.cursor.fetchall())
         return 1, self.cursor.fetchall()
         #else:
         #    return 0, "Error"

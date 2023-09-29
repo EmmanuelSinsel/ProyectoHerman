@@ -1,0 +1,14 @@
+Auth:
+    0 = Wrong Password
+    2 = Non-existing User
+    400 = Valid Token
+    500 = Invalid Token
+    600 = Not logged
+
+SQL:
+    1 = Succesful
+    0 = Error
+
+    HELPER:
+        0 = Repeated
+        1 = Not Repeated

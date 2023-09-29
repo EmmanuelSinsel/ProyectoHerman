@@ -2,6 +2,7 @@
 //type 1 = Admin, type 0 = Alumn
 {
   "type": "1",
+  "token": "",
   "data": {
       "email":"sinsel@gmail.com",
       "password":"1234567890"
