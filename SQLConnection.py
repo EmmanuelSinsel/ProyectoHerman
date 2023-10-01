@@ -39,7 +39,6 @@ class SQLConnector:
     def insert(self, table, fields, values):
         cursors = ""
         for i in values:
-            print(type(i))
             if type(i) is str:
                 cursors += "%s, "
             if type(i) is float:
@@ -83,7 +82,6 @@ class SQLConnector:
             query = "SELECT * FROM " + table
         print(query)
         self.cursor.execute(query)
-        print(self.cursor.fetchall())
         return 1, self.cursor.fetchall()
         #else:
         #    return 0, "Error"

@@ -22,42 +22,61 @@ from typing import Annotated
 app = FastAPI()
 
 # PAGINAS
-import pages.Admin as Admin  # TODAS IMPLEMENTADAS, TODAS CON FUNCION, TODAS PROBADAS
-import pages.Alumn as Alumn  # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
-import pages.Author as Author  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Book as Book  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Category as Category  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Favorite as Favorite  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Library as Library  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Reserve as Reserve  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Transaction as Transaction  # TODAS IMPLEMENTADAS, NINGUNA TIENE FUNCION
-import pages.Auth as Auth
+import pages.Admin as Admin              # TODAS IMPLEMENTADAS, TODAS CON FUNCION, TODAS PROBADAS
+import pages.Alumn as Alumn              # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Author as Author            # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Book as Book                # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Category as Category        # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Favorite as Favorite        # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Library as Library          # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Reserve as Reserve          # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Transaction as Transaction  # TODAS IMPLEMENTADAS, TODAS CON FUNCION, NINGUNA PROBADA
+import pages.Auth as Auth                # TODAS IMPLEMENTADAS, TODAS CON FUNCION, TODAS PROBADAS
 
 # TRIGGER DE AUTENTICACION----------------------------------------------------------------------------------------------
 @app.middleware("http")
 async def Middleware(request: Request, call_next):
-    headers = dict(request.scope['headers'])
-    try:
-        token = bytes.decode(headers[b'token'])
-        if(token == ""):
-            print("Not logged")
-            response = {"status": "600", "msg": "Not logged"}
-            return JSONResponse(content=response)
-        elif(Auth.Authenticate(token)):
-            print("Authenticated: "+ token)
-            response = await call_next(request)
-            return response
-        else:
-            print("Invalid token")
-            response = {"status": "500", "msg": "Invalid token"}
-            return JSONResponse(content=response)
-    except:
+    base = str(request.base_url)
+    url = str(request.url)
+    if base in url:
+        url = url.replace(base, '')
+
+    if url == "docs" or url == "openapi.json":
+        response = await call_next(request)
         return response
+    elif url == "login":
+        response = await call_next(request)
+        return response
+    else:
+        headers = dict(request.scope['headers'])
+        try:
+            token = bytes.decode(headers[b'token'])
+            if url == "login":
+                response = await call_next(request)
+                return response
+            elif token == "":
+                print("Not logged")
+                response = {"status": "600", "msg": "Not logged"}
+                return JSONResponse(content=response)
+            elif (Auth.Authenticate(token)):
+                print("Authenticated: " + token)
+                response = await call_next(request)
+                return response
+            else:
+                print("Invalid token")
+                response = {"status": "500", "msg": "Invalid token"}
+                return JSONResponse(content=response)
+        except:
+            return response
+
+
+
+
 
 # AUTENTICACION---------------------------------------------------------------------------------------------------------
 
 @app.post("/login")
-async def login(request: Request):
+async def login(request: models.Login):
     return await Auth.login(request)
 
 @app.post("/logout")
@@ -66,8 +85,7 @@ async def logout(request: Request):
 
 # ADMINS----------------------------------------------------------------------------------------------------------------
 @app.post("/insert_admin")
-async def insert_admin(request: models.Admin, token: str = Header(None)):
-    print(token)
+async def insert_admin(request: models.Admin):
     return Admin.insert_admin(request)
 
 @app.post("/update_admin")
@@ -76,12 +94,12 @@ async def update_admin(request: models.Admin):
 
 
 @app.post("/delete_admin")
-async def delete_admin(request: Request):
+async def delete_admin(request: models.Where):
     return Admin.delete_admin(request)
 
 
 @app.post("/list_admin")
-async def list_admin(request: Request):
+async def list_admin(request: models.Where):
     return await Admin.list_admin(request)
 
 
@@ -123,27 +141,27 @@ async def profile_alumn(request: Request):
 
 # LIBROS----------------------------------------------------------------------------------------------------------------
 @app.post("/insert_book")
-async def insert_book(request: Request):
+async def insert_book(request: models.Book):
     return await Book.insert_book(request)
 
 
 @app.post("/update_book")
-async def update_book(request: Request):
+async def update_book(request: models.Book):
     return await Book.update_book(request)
 
 
 @app.post("/delete_book")
-async def delete_book(request: Request):
+async def delete_book(request: models.Where):
     return await Book.delete_book(request)
 
 
 @app.post("/list_book")
-async def list_book(request: Request):
+async def list_book(request: models.Where):
     return await Book.list_book(request)
 
 
 @app.post("/comment_book")
-async def comment_book(request: Request):
+async def comment_book(request: models.Commentary):
     return await Book.comment_book(request)
 
 

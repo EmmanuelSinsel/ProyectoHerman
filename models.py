@@ -1,5 +1,17 @@
 from pydantic import BaseModel
 
+
+class Login(BaseModel):
+    type: str | None = None
+    token: str | None = None
+    email: str | None = None
+    password: str | None = None
+
+
+class Where(BaseModel):
+    where: str | None = None
+
+
 class Library(BaseModel):
     name: str | None = None
     address: str | None = None
@@ -8,6 +20,7 @@ class Library(BaseModel):
     state: str | None = None
 
     where: str | None = None
+
 
 class Admin(BaseModel):
     user: str | None = None
@@ -20,6 +33,7 @@ class Admin(BaseModel):
 
     where: str | None = None
 
+
 class Alumn(BaseModel):
     account_number: str | None = None
     user: str | None = None
@@ -31,9 +45,10 @@ class Alumn(BaseModel):
     phone: str | None = None
     email: str | None = None
     last_preference: str | None = None
-    state : str | None = None
+    state: str | None = None
 
     where: str | None = None
+
 
 class Advice(BaseModel):
     id_alumn: str | None = None
@@ -42,8 +57,10 @@ class Advice(BaseModel):
 
     where: str | None = None
 
+
 class Book(BaseModel):
     tittle: str | None = None
+    isbn: str | None = None
     id_category: str | None = None
     id_author: str | None = None
     status: str | None = None
@@ -53,12 +70,14 @@ class Book(BaseModel):
 
     where: str | None = None
 
-class Book_Notation(BaseModel):
+
+class BookNotation(BaseModel):
     id_book: str | None = None
     message: str | None = None
     state: str | None = None
 
     where: str | None = None
+
 
 class Favorite(BaseModel):
     id_alumn: str | None = None
@@ -66,6 +85,7 @@ class Favorite(BaseModel):
     state: str | None = None
 
     where: str | None = None
+
 
 class Commentary(BaseModel):
     id_alumn: str | None = None
@@ -75,17 +95,20 @@ class Commentary(BaseModel):
 
     where: str | None = None
 
+
 class Author(BaseModel):
     name: str | None = None
-    state : str | None = None
+    state: str | None = None
 
     where: str | None = None
+
 
 class Category(BaseModel):
     category: str | None = None
     state: str | None = None
 
     where: str | None = None
+
 
 class Transaction(BaseModel):
     id_alumn: str | None = None
@@ -98,6 +121,7 @@ class Transaction(BaseModel):
     state: str | None = None
 
     where: str | None = None
+
 
 class Reserve(BaseModel):
     id_alumn: str | None = None

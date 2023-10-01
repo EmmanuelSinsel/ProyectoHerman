@@ -1,5 +1,5 @@
 from SQLConnection import SQLConnector
-
+import requests
 con = SQLConnector(host="localhost",
                      db="biblioteca",
                    port="3306",
@@ -33,4 +33,22 @@ def testDelete():
     status, msg = con.delete(table="admins",
                              where="id_admin = 16")
     print(msg)
-testDelete()
+
+
+
+#  GOOGLE BOOKS API
+def get_book(isbn, title):
+    if isbn == "":
+        url = 'https://www.googleapis.com/books/v1/volumes?q=title:' + title;
+        request = requests.get(url)
+        res = request.json()
+        title = res['items'][0]['volumeInfo']['title']
+        author = res['items'][0]['volumeInfo']['authors'][0]
+        return title, author
+    if title == "":
+        url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:' + isbn;
+        request = requests.get(url)
+        res = request.json()
+        title = res['items'][0]['volumeInfo']['title']
+        author = res['items'][0]['volumeInfo']['authors'][0]
+        return title, author

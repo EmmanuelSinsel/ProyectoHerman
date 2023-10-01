@@ -5,7 +5,7 @@ import models
 table = "ALUMN"
 
 
-def insert_alumn(request):
+def insert_alumn(request: models.Alumn):
     res = request.dict()
     if (repeated("ALUMN", "email", res['email']) == 1):
         fields, values = converter.insert(request)
@@ -17,7 +17,7 @@ def insert_alumn(request):
         return {"message": "Email already registered", "status": 2}
 
 
-def update_alumn(request):
+def update_alumn(request: models.Alumn):
     res = request.dict()
     values = converter.update(request)
     status, msg = con.update(table=table,
@@ -26,22 +26,22 @@ def update_alumn(request):
     return {"message": msg, "status": status}
 
 
-async def delete_alumn(request):
+async def delete_alumn(request: models.Where):
     res = await request.json()
     status, msg = con.update(table=table,
                              values=["state = 0"],
-                             where="email='" + res['email'] + "'")
+                             where=res['where'])
     return {"message": msg, "status": status}
 
 
-async def list_alumn(request):
+async def list_alumn(request: models.Where):
     res = await request.json()
     status, res = con.select(table=table,
                              where=res['where'])
     return res
 
 
-def advice_alumn(request):
+def advice_alumn(request: models.Advice):
     fields, values = converter.insert(request)
     status, msg = con.insert(table="ADVICE",
                              fields=fields,
@@ -49,7 +49,7 @@ def advice_alumn(request):
     return {"message": msg, "status": status}
 
 
-async def historial_alumn(request):
+async def historial_alumn(request: models.Where):
     res = await request.json()
     status, res = con.select(table="TRANSACTIONS",
                              where=res['where'])

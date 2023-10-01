@@ -5,7 +5,6 @@ import models
 table = "ADMIN"
 
 
-
 #ADMINS
 def insert_admin(request: models.Admin):
     res = request.dict()
@@ -23,18 +22,18 @@ def update_admin(request: models.Admin):
     values = converter.update(request)
     status, msg = con.update(table=table,
                              values=values,
-                             where="email='"+res['email']+"'")
+                             where="email='"+res['where']+"'")
     return {"message": msg,"status":status}
 
-async def delete_admin(request):
-    res = await request.json()
+async def delete_admin(request: models.Where):
+    res = request.dict()
     status, msg = con.update(table=table,
                              values=["state = 0"],
-                             where="email='"+res['email']+"'")
+                             where=res['where'])
     return {"message": msg,"status":status}
 
-async def list_admin(request):
-    res = await request.json()
+async def list_admin(request: models.Where):
+    res = request.dict()
     status, res = con.select(table=table,
                              where=res['where'])
     return res
