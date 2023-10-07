@@ -1,3 +1,6 @@
+from fastapi import Request
+
+import helpers
 from main import con, converter
 from helpers import repeated
 import models
@@ -47,3 +50,9 @@ async def comment_book(request: models.Commentary):
                              fields=fields,
                              values=values)
     return {"message": msg, "status": status}
+
+async def get_book(request: models.GetBook):
+    res = request.dict()
+    isbn = res['isbn']
+    title = res['title']
+    return helpers.get_book(isbn,title)

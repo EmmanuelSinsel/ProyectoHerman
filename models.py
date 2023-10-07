@@ -11,6 +11,9 @@ class Login(BaseModel):
 class Where(BaseModel):
     where: str | None = None
 
+class GetBook(BaseModel):
+    isbn: str | None = None
+    title: str | None = None
 
 class Library(BaseModel):
     name: str | None = None

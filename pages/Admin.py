@@ -17,23 +17,21 @@ def insert_admin(request: models.Admin):
     else:
         return {"message": "Email already registered","status":2}
 
-def update_admin(request: models.Admin):
+def update_admin(email: str, request: models.Admin):
     res = request.dict()
     values = converter.update(request)
     status, msg = con.update(table=table,
                              values=values,
-                             where="email='"+res['where']+"'")
+                             where="email='"+email+"'")
     return {"message": msg,"status":status}
 
-async def delete_admin(request: models.Where):
-    res = request.dict()
+def delete_admin(where: str):
     status, msg = con.update(table=table,
                              values=["state = 0"],
-                             where=res['where'])
+                             where=where)
     return {"message": msg,"status":status}
 
-async def list_admin(request: models.Where):
-    res = request.dict()
+async def list_admin(where: str):
     status, res = con.select(table=table,
-                             where=res['where'])
+                             where=where)
     return res

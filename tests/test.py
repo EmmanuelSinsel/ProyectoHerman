@@ -52,3 +52,27 @@ def get_book(isbn, title):
         title = res['items'][0]['volumeInfo']['title']
         author = res['items'][0]['volumeInfo']['authors'][0]
         return title, author
+
+
+@app.post("/insert_admin")
+async def insert_admin(request: models.Admin):
+    return Admin.insertNotRepeated(request, "email")
+
+@app.put("/update_admin/{updateValue}")
+async def update_admin(updateValue: str, request: models.Admin):
+    return Admin.update(request, updateValue)
+
+@app.put("/delete_admin/{where}")
+async def delete_admin(where: str):
+    return Admin.delete(where)
+
+@app.get("/list_admin/{where}")
+async def list_admin(where: str):
+    print(where)
+    return await Admin.list(where)
+
+@app.get("/list_admin/")
+async def list_admin():
+    return await Admin.list("")
+
+

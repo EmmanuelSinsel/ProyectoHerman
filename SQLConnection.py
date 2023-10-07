@@ -58,7 +58,7 @@ class SQLConnector:
             else:
                 return 0, "Error while inserting values"
         except Error as e:
-            print("Error: ", e)
+            return 0, "Error while inserting values"
 
     #JALA Al 100
     def update(self, table, values, where):
