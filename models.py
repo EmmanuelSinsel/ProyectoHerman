@@ -33,7 +33,7 @@ class Admin(BaseModel):
     phone: str | None = None
     email: str | None = None
     state: str | None = None
-
+    library_id: str | None = None
     where: str | None = None
 
 

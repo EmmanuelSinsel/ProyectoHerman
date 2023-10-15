@@ -1,14 +1,35 @@
-//-----------LOGIN
+//-----------AUTHENTICATION
+//--LOGIN
 //type 1 = Admin, type 0 = Alumn
 {
   "type": "1",
   "token": "",
-  "data": {
-      "email":"sinsel@gmail.com",
-      "password":"1234567890"
-  }
+  "email":"sinsel@gmail.com",
+  "password":"1234567890",
 }
-
+//--LOGOUT
+{
+  "token": "xxxxxxxxxxx"
+}
+//--PASSWORD RECOVERY REQUEST
+{
+  "email": "sinselemmanuel@gmail.com",
+  "type": "1"
+}
+//--PASSWORD RESET
+{
+  "token": "xxxxxxxxxxx",
+  "password": "newpassword"
+}
+//--SEND EMAIL VERIFICATION
+{
+  "email": "sinselemmanuel@gmail.com",
+  "type": "1"
+}
+//--EMAIL VERIFICATION
+{
+  "token": "xxxxxxxxxxx",
+}
 //-----------LIBRARY
 //--INSERT
 
@@ -27,7 +48,7 @@
   "last_name":"sinsel",
   "phone":"6681342312",
   "email":"sinsel@gmail.com",
-  "state": 1
+  "state": "2"
 }
 //--UPDATE
 {
@@ -36,16 +57,16 @@
   "first_name":"emmanuel",
   "last_name":"sinsel",
   "phone":"6681342312",
-  "email":"sinsel13@gmail.com",
+  "email":"sinselemmanuel@gmail.com",
   "state":"1"
 }
 //--DELETE
 {
-  "email":"sinsel123123@gmail.com"
+  "email":"sinselemmanuel@gmail.com"
 }
 //--LIST
 {
-  "where":"email='sinsel123123@gmail.com'"
+  "where":"email='sinselemmanuel@gmail.com'"
 }
 //-----------ALUMN
 //--INSERT

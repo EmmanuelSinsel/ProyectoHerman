@@ -1,7 +1,7 @@
 import requests
 from difflib import SequenceMatcher
 
-from main import con
+from manager import con
 #HELPERS
 def repeated(table, field, value):
     sentence = field + "='"+value+"'"

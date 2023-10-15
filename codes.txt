@@ -4,6 +4,7 @@ Auth:
     400 = Valid Token
     500 = Invalid Token
     600 = Not logged
+    800 = Logged Out
 
 SQL:
     1 = Succesful
@@ -12,3 +13,8 @@ SQL:
     HELPER:
         0 = Repeated
         1 = Not Repeated
+
+User:
+    0 = Disabled/Deleted
+    1 = Enabled
+    2 = Email verification required
