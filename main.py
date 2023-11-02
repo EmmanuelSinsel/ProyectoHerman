@@ -11,18 +11,27 @@ import models
 # API
 # pip install fastapi
 # pip install uvicorn
-from fastapi import FastAPI, Request, Header
+from fastapi import FastAPI, Request, Header, Response
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 
 app = FastAPI()
+origins = ["*"]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 #  AUTOMATIZACIONES
 
 #  PAGINAS
 import FullManager as APIManager
 
-Admin = APIManager.CRUD(Table="admin", ApiName="admin", RepeatedField="email", Enabled="IUDLW", Model=models.Admin)
+Admin = APIManager.CRUD(Table="admin", ApiName="admin", RepeatedField="email", Enabled="IUDLWA", Model=models.Admin)
 app.include_router(Admin.router)
 
 Alumn = APIManager.CRUD(Table="ALUMN", ApiName="alumn", RepeatedField="email", Enabled="IUDLW", Model=models.Alumn)
@@ -64,11 +73,13 @@ import pages.Auth as Auth
 async def Middleware(request: Request, call_next):
     base = str(request.base_url)
     url = str(request.url)
-    excluded_urls = ["login", "password_recover", "password_reset", "verify_email", "send_email_verification"]
+    excluded_urls = ["api/login", "api/password_recover", "api/password_reset", "api/verify_email", "api/send_email_verification",
+                     "api/password_token_verify"]
     if base in url:
         url = url.replace(base, '')
     if url == "docs" or url == "openapi.json":
         response = await call_next(request)
+
         return response
     elif url in excluded_urls:
         response = await call_next(request)
@@ -76,10 +87,12 @@ async def Middleware(request: Request, call_next):
     else:
         headers = dict(request.scope['headers'])
         try:
-            token = bytes.decode(headers[b'token'])
+            token = request.headers.get('token')
+            print(token)
             if url == "login":
                 response = await call_next(request)
-                return response
+                headers = {"Access-Control-Allow-Origin": "*"}
+                return JSONResponse(content=response, headers=headers)
             elif token == "":
                 print("Not logged")
                 response = {"status": "600", "msg": "Not logged"}
@@ -95,41 +108,43 @@ async def Middleware(request: Request, call_next):
         except:
             return response
 
-
 # AUTENTICACION---------------------------------------------------------------------------------------------------------
 
-@app.post("/login")
+@app.post("/api/login")
 async def login(request: models.Login):
     return await Auth.login(request)
 
 
-@app.post("/logout")
+@app.post("/api/logout")
 async def logout(request: Request):
     return await Auth.logout(request)
 
 
-@app.post("/password_recover")
+@app.post("/api/password_recover")
 async def passwordRecover(request: Request):
     return await Auth.sendRecoverToken(request)
 
+@app.post("/api/password_token_verify")
+async def passwordTokenVerify(request: Request):
+    return await Auth.VerifyPasswordToken(request)
 
-@app.post("/password_reset")
+@app.post("/api/password_reset")
 async def passwordReset(request: Request):
     return await Auth.PasswordReset(request)
 
 
-@app.post("/send_email_verification")
+@app.post("/api/send_email_verification")
 async def sendEmailVerification(request: Request):
     return await Auth.sendEmailVerification(request)
 
 
-@app.post("/verify_email")
+@app.post("/api/verify_email")
 async def verifyEmail(request: Request):
     return await Auth.emailVerification(request)
 
 
 # UTILITIES-------------------------------------------------------------------------------------------------------------
-@app.post("/search_book")
+@app.post("/api/search_book")
 async def search_book(request: models.GetBook):
     res = request.dict()
     return get_book(res['isbn'], res['title'])

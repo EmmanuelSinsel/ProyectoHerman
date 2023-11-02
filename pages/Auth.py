@@ -65,7 +65,7 @@ async def login(request: models.Login):
         status, res = con.select(table="ADMIN",
                                  where="email = '"+email+"'")
         print(res)
-        if(status == 1):
+        if(len(res)>=1):
             if res[0][2] == resource['password']:
                 return generate_token(res[0][0], user_type)
             else:
@@ -83,7 +83,7 @@ async def login(request: models.Login):
         else:
             return {"status": "2", "msg": "Non-existing user", "token": ""}
     else:
-        return {"status": "1", "msg": "Missing Data", "token": ""}
+        return {"status": "3", "msg": "Missing Data", "token": ""}
 async def logout(request: Request):
     resource = await request.json()
     token = resource['token']
@@ -96,6 +96,7 @@ async def logout(request: Request):
 # PASSWORD RESET
 async def sendRecoverToken(request: Request):
     resource = await request.json()
+    print(resource)
     sender = emailSender(sender="therealchalinosanchez@gmail.com", password="mlta vekc irlj exls")
     code = ""
     while True:
@@ -138,6 +139,22 @@ async def sendRecoverToken(request: Request):
     else:
         return {"status": "0", "message": "Email not registered"}
 
+async def VerifyPasswordToken(request: Request):
+    resource = await request.json()
+    token = resource['token']
+    status, res = con.select(table="VERIFY_TOKEN",
+                             where="token = '" + token + "'")
+    expiration_date = parse(str(res[0][4]))
+    today = parse(str(date.today()))
+    print(today)
+    if expiration_date > today:
+        return {"status": "1", "message":"Valid Token"}
+    else:
+        con.update(table="VERIFY_TOKEN",
+                   values=["expirated = '1'"],
+                   where="token = " + str(token))
+        return {"status": "0", "message":"Token Expired"}
+
 async def PasswordReset(request: Request):
     resource = await request.json()
     token = resource['token']
@@ -151,17 +168,17 @@ async def PasswordReset(request: Request):
         if type == 1: #ADMIN
             con.update(table="admin",
                        values=["password = '"+password+"'"],
-                       where="id_admin = " + str(user))
+                       where="id_admin = '" + str(user)+"'")
             exit = 1
         if type == 0: #ALUMN
             con.update(table="alumn",
                        values=["password = '"+password+"'"],
-                       where="id_alumn = " + str(user))
+                       where="id_alumn = '" + str(user)+"'")
             exit = 1
         if exit == 1:
             con.update(table="VERIFY_TOKEN",
                        values=["expirated = '1'"],
-                       where="token = " + str(token))
+                       where="token = '" + str(token)+"'")
             return {"status": "1", "message": "Password Updated"}
     else:
         return {"status": "2", "message": "Token expirated"}
