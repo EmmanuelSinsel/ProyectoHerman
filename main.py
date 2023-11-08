@@ -74,7 +74,7 @@ async def Middleware(request: Request, call_next):
     base = str(request.base_url)
     url = str(request.url)
     excluded_urls = ["api/login", "api/password_recover", "api/password_reset", "api/verify_email", "api/send_email_verification",
-                     "api/password_token_verify"]
+                     "api/password_token_verify", "api/authenticate"]
     if base in url:
         url = url.replace(base, '')
     if url == "docs" or url == "openapi.json":
@@ -119,6 +119,9 @@ async def login(request: models.Login):
 async def logout(request: Request):
     return await Auth.logout(request)
 
+@app.post("/api/authenticate")
+async def logout(request: Request):
+    return await Auth.authenticate_self(request)
 
 @app.post("/api/password_recover")
 async def passwordRecover(request: Request):
