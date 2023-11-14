@@ -14,7 +14,6 @@ import models
 from fastapi import FastAPI, Request, Header, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated
 
 app = FastAPI()
 origins = ["*"]
@@ -31,38 +30,64 @@ app.add_middleware(
 #  PAGINAS
 import FullManager as APIManager
 
-Admin = APIManager.CRUD(Table="admin", ApiName="admin", RepeatedField="email", Enabled="IUDLWA", Model=models.Admin)
+Admin = APIManager.CRUD(table="admin",
+                        api_name="admin",
+                        enabled=["insert", "update", "delete", "select", "account"],
+                        model=models.Admin)
 app.include_router(Admin.router)
 
-Alumn = APIManager.CRUD(Table="ALUMN", ApiName="alumn", RepeatedField="email", Enabled="IUDLW", Model=models.Alumn)
+Alumn = APIManager.CRUD(table="ALUMN",
+                        api_name="alumn",
+                        enabled=["insert", "update", "delete", "select"],
+                        model=models.Alumn)
 app.include_router(Admin.router)
 
-Advices = APIManager.CRUD(Table="ADVICE", ApiName="advice", RepeatedField="", Enabled="RUDLW", Model=models.Advice)
+Advices = APIManager.CRUD(table="ADVICE",
+                          api_name="advice",
+                          enabled=["insert", "update", "delete", "select"],
+                          model=models.Advice)
 app.include_router(Admin.router)
 
-Author = APIManager.CRUD(Table="AUTHOR", ApiName="author", RepeatedField="", Enabled="RUDLW", Model=models.Author)
+Author = APIManager.CRUD(table="AUTHOR",
+                         api_name="author",
+                         enabled=["insert", "update", "delete", "select"],
+                         model=models.Author)
 app.include_router(Admin.router)
 
-Book = APIManager.CRUD(Table="BOOK", ApiName="book", RepeatedField="isbn", Enabled="IUDLW", Model=models.Book)
+Book = APIManager.CRUD(table="BOOK",
+                       api_name="book",
+                       enabled=["insert", "update", "delete", "select"],
+                       model=models.Book)
 app.include_router(Admin.router)
 
-Category = APIManager.CRUD(Table="CATEGORY", ApiName="category", RepeatedField="", Enabled="RUDLW",
-                           Model=models.Category)
+Category = APIManager.CRUD(table="CATEGORY",
+                           api_name="category",
+                           enabled=["insert", "update", "delete", "select"],
+                           model=models.Category)
 app.include_router(Admin.router)
 
-Favorite = APIManager.CRUD(Table="FAVORITE", ApiName="favorite", RepeatedField="", Enabled="RUDLW",
-                           Model=models.Favorite)
+Favorite = APIManager.CRUD(table="FAVORITE",
+                           api_name="favorite",
+                           enabled=["insert", "update", "delete", "select"],
+                           model=models.Favorite)
 app.include_router(Admin.router)
 
-Library = APIManager.CRUD(Table="LIBRARY", ApiName="library", RepeatedField="email", Enabled="IUDLW",
-                          Model=models.Library)
+Library = APIManager.CRUD(table="LIBRARY",
+                          api_name="library",
+                          enabled=["insert", "update", "delete", "select"],
+                          model=models.Library)
 app.include_router(Admin.router)
 
-Reserve = APIManager.CRUD(Table="RESERVES", ApiName="reserve", RepeatedField="", Enabled="RUDLW", Model=models.Reserve)
+Reserve = APIManager.CRUD(table="RESERVES",
+                          api_name="reserve",
+                          enabled=["insert", "update", "delete", "select"],
+                          model=models.Reserve)
 app.include_router(Admin.router)
 
-Transaction = APIManager.CRUD(Table="TRANSACTIONS", ApiName="transaction", RepeatedField="", Enabled="RUDLW",
-                              Model=models.Reserve)
+Transaction = APIManager.CRUD(table="TRANSACTIONS",
+                              api_name="transaction",
+                              enabled=["insert", "update", "delete", "select"],
+                              model=models.Reserve)
 app.include_router(Admin.router)
 
 import pages.Auth as Auth
@@ -88,66 +113,62 @@ async def Middleware(request: Request, call_next):
         headers = dict(request.scope['headers'])
         try:
             token = request.headers.get('token')
-            print(token)
             if url == "login":
                 response = await call_next(request)
                 headers = {"Access-Control-Allow-Origin": "*"}
                 return JSONResponse(content=response, headers=headers)
             elif token == "":
-                print("Not logged")
-                response = {"status": "600", "msg": "Not logged"}
+                response = {"status": "401", "msg": "Not logged"}
                 return JSONResponse(content=response)
             elif (Auth.Authenticate(token)):
-                print("Authenticated: " + token)
                 response = await call_next(request)
                 return response
             else:
-                print("Invalid token")
-                response = {"status": "500", "msg": "Invalid token"}
+                response = {"status": "401", "msg": "Invalid token"}
                 return JSONResponse(content=response)
         except:
             return response
 
 # AUTENTICACION---------------------------------------------------------------------------------------------------------
 
-@app.post("/api/login")
+@app.post("/api/login", tags=["Authorization"])
 async def login(request: models.Login):
     return await Auth.login(request)
 
 
-@app.post("/api/logout")
+@app.post("/api/logout",tags=["Authorization"])
 async def logout(request: Request):
     return await Auth.logout(request)
 
-@app.post("/api/authenticate")
+@app.post("/api/authenticate",tags=["Authorization"])
 async def logout(request: Request):
     return await Auth.authenticate_self(request)
 
-@app.post("/api/password_recover")
+@app.post("/api/password_recover",tags=["Authorization"])
 async def passwordRecover(request: Request):
     return await Auth.sendRecoverToken(request)
 
-@app.post("/api/password_token_verify")
+@app.post("/api/password_token_verify",tags=["Authorization"])
 async def passwordTokenVerify(request: Request):
     return await Auth.VerifyPasswordToken(request)
 
-@app.post("/api/password_reset")
+@app.post("/api/password_reset",tags=["Authorization"])
 async def passwordReset(request: Request):
     return await Auth.PasswordReset(request)
 
 
-@app.post("/api/send_email_verification")
+@app.post("/api/send_email_verification",tags=["Authorization"])
 async def sendEmailVerification(request: Request):
     return await Auth.sendEmailVerification(request)
 
 
-@app.post("/api/verify_email")
+@app.post("/api/verify_email",tags=["Authorization"])
 async def verifyEmail(request: Request):
     return await Auth.emailVerification(request)
 
 
 # UTILITIES-------------------------------------------------------------------------------------------------------------
-@app.post("/api/search_book")
+@app.post("/api/search_book",tags=["Authorization"])
 async def search_book(request: models.GetBook):
     res = request.dict()
     return get_book(res['isbn'], res['title'])

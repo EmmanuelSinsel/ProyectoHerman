@@ -8,8 +8,7 @@ class JSONtoLIST:
         keys = list(JSON.keys())
         ans = ""
         for i in keys:
-            if(not i == "where"):
-                ans += i + ", "
+            ans += i + ", "
         ans = ans[:-2]
         values = []
         for key, value in JSON.items():

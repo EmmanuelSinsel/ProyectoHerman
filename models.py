@@ -22,7 +22,6 @@ class Library(BaseModel):
     email: str | None = None
     state: str | None = None
 
-    where: str | None = None
 
 
 class Admin(BaseModel):
@@ -34,7 +33,6 @@ class Admin(BaseModel):
     email: str | None = None
     state: str | None = None
     library_id: str | None = None
-    where: str | None = None
 
 
 class Alumn(BaseModel):
@@ -50,15 +48,11 @@ class Alumn(BaseModel):
     last_preference: str | None = None
     state: str | None = None
 
-    where: str | None = None
-
 
 class Advice(BaseModel):
     id_alumn: str | None = None
     message: str | None = None
     state: str | None = None
-
-    where: str | None = None
 
 
 class Book(BaseModel):
@@ -71,23 +65,17 @@ class Book(BaseModel):
     id_library: str | None = None
     state: str | None = None
 
-    where: str | None = None
-
 
 class BookNotation(BaseModel):
     id_book: str | None = None
     message: str | None = None
     state: str | None = None
 
-    where: str | None = None
-
 
 class Favorite(BaseModel):
     id_alumn: str | None = None
     id_book: str | None = None
     state: str | None = None
-
-    where: str | None = None
 
 
 class Commentary(BaseModel):
@@ -96,21 +84,15 @@ class Commentary(BaseModel):
     message: str | None = None
     state: str | None = None
 
-    where: str | None = None
-
 
 class Author(BaseModel):
     name: str | None = None
     state: str | None = None
 
-    where: str | None = None
-
 
 class Category(BaseModel):
     category: str | None = None
     state: str | None = None
-
-    where: str | None = None
 
 
 class Transaction(BaseModel):
@@ -123,8 +105,6 @@ class Transaction(BaseModel):
     id_library: str | None = None
     state: str | None = None
 
-    where: str | None = None
-
 
 class Reserve(BaseModel):
     id_alumn: str | None = None
@@ -132,5 +112,3 @@ class Reserve(BaseModel):
     date_pickup: str | None = None
     id_library: str | None = None
     state: str | None = None
-
-    where: str | None = None
