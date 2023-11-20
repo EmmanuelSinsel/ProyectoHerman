@@ -12,26 +12,45 @@ from email.mime.text import MIMEText
 characters = string.ascii_letters + string.digits
 token_expiration_time = 30  # DIAS
 
+
 def generate_token(id_user, type_user):
     flag = 0
     while flag == 0:
         token = ''.join(random.choice(characters) for i in range(30))
         print("Generated Token: "+token)
 
-        status, res = con.select(table="TOKEN",
+        status, res = con.select(table="token",
                                  where="token = '" + token + "'")
         if len(res) == 0:
             break
     expiration_date = date.today()+ timedelta(days=token_expiration_time)
     print(id_user, type_user, token, expiration_date)
-    con.insert(table="TOKEN",
+    con.insert(table="token",
                fields="id_user, type_user, token, expiration_date, expired",
                values=[str(id_user), str(type_user), str(token), str(expiration_date), "0"])
     return {"status": "1", "msg": "Sucessful login", "token": token}
 
-
+async def authorize(request: Request, type: string):
+    token = request.headers.get('token')
+    status, res = con.select(table="token",
+                             where="token = '" + token + "'")
+    if (len(res) > 0):
+        if res[0][5] == "0":
+            expiration_date = parse(str(res[0][4]))
+            today = parse(str(date.today()))
+            if expiration_date > today:
+                if res[0][2] == type:
+                    return True
+            else:
+                con.update(table="token",
+                           values=["expired = '1'"],
+                           where="id_token = " + str(res[0][0]))
+                return False
+        if res[0][5] == "1":
+            return False
 def Authenticate(token):
-    status, res = con.select(table="TOKEN",
+
+    status, res = con.select(table="token",
                              where="token = '" + token + "'")
     if(len(res)>0):
         if res[0][5] == "0":
@@ -41,14 +60,35 @@ def Authenticate(token):
                 print("Authentication Succesful")
                 return True
             else:
-                con.update(table="TOKEN",
+                con.update(table="token",
                            values=["expired = '1'"],
-                           where="id_token = "+res[0][0])
+                           where="id_token = "+str(res[0][0]))
                 print("Authentication Failed")
                 return False
         if res[0][5] == "1":
             print("Authentication Failed")
             return False
+
+async def authenticate_self(request: Request):
+    resource = await request.json()
+    token = resource['token']
+    status, res = con.select(table="token",
+                             where="token = '" + token + "'")
+    if(len(res)>0):
+        if res[0][5] == "0":
+            expiration_date = parse(str(res[0][4]))
+            today = parse(str(date.today()))
+            if expiration_date > today:
+                print("Authentication Succesful")
+                return {"status": "1", "msg": "Succesful Auth"}
+            else:
+                con.update(table="token",
+                           values=["expired = '1'"],
+                           where="id_token = "+res[0][0])
+                print("Authentication Failed")
+                return {"status": "0", "msg": "Expired Token"}
+        if res[0][5] == "1":
+            return {"status": "0", "msg": "Expired Token"}
 
 # AUTHENTICATION
 async def login(request: models.Login):
@@ -62,7 +102,7 @@ async def login(request: models.Login):
     user_type = resource["type"]
     email = resource["email"]
     if user_type == "1" and not email == "":  # LOGIN ADMIN
-        status, res = con.select(table="ADMIN",
+        status, res = con.select(table="admin",
                                  where="email = '"+email+"'")
         print(res)
         if(len(res)>=1):
@@ -73,7 +113,7 @@ async def login(request: models.Login):
         else:
             return {"status": "2", "msg": "Non-existing user", "token": ""}
     elif user_type == "0":  # LOGIN ALUMN
-        status, res = con.select(table="ALUMN",
+        status, res = con.select(table="alumn",
                                  where="email = '"+email+"'")
         if(status == 1):
             if res[0][2] == resource['password']:
@@ -87,7 +127,7 @@ async def login(request: models.Login):
 async def logout(request: Request):
     resource = await request.json()
     token = resource['token']
-    con.update(table="TOKEN",
+    con.update(table="token",
                values=["expired = '1'"],
                where="id_token = " + token)
     return {"status":800,"Message":"Logged Out"}
@@ -105,7 +145,7 @@ async def sendRecoverToken(request: Request):
         p3 = ''.join(random.choice(characters) for i in range(3))
         code = p1 + "-" + p2 + "-" + p3
         print(code)
-        status, res = con.select(table="VERIFY_TOKEN",
+        status, res = con.select(table="verify_token",
                                  where="token = '" + code + "'")
         if len(res) == 0:
             break
@@ -135,31 +175,36 @@ async def sendRecoverToken(request: Request):
                              code=code)
             return {"status": "1", "message": "Email sent"}
         else:
-            return {"status": "0", "message": "Error while registering token"}
+            return {"status": "2", "message": "Error while registering token"}
     else:
         return {"status": "0", "message": "Email not registered"}
+
 
 async def VerifyPasswordToken(request: Request):
     resource = await request.json()
     token = resource['token']
-    status, res = con.select(table="VERIFY_TOKEN",
+    status, res = con.select(table="verify_token",
                              where="token = '" + token + "'")
-    expiration_date = parse(str(res[0][4]))
-    today = parse(str(date.today()))
-    print(today)
-    if expiration_date > today:
-        return {"status": "1", "message":"Valid Token"}
+    if len(res) > 0:
+        expiration_date = parse(str(res[0][4]))
+        today = parse(str(date.today()))
+        print(today)
+        if expiration_date > today:
+            return {"status": "1", "message":"Valid Token"}
+        else:
+            con.update(table="verify_token",
+                       values=["expirated = '1'"],
+                       where="token = " + str(token))
+            return {"status": "2", "message":"Token Expired"}
     else:
-        con.update(table="VERIFY_TOKEN",
-                   values=["expirated = '1'"],
-                   where="token = " + str(token))
-        return {"status": "0", "message":"Token Expired"}
+        return {"status": "0", "message": "Invalid Expired"}
+
 
 async def PasswordReset(request: Request):
     resource = await request.json()
     token = resource['token']
     password = resource['password']
-    status, res = con.select(table="VERIFY_TOKEN",
+    status, res = con.select(table="verify_token",
                              where="token = '" + token + "'")
     user = int(res[0][2])
     type = int(res[0][3])
@@ -176,7 +221,7 @@ async def PasswordReset(request: Request):
                        where="id_alumn = '" + str(user)+"'")
             exit = 1
         if exit == 1:
-            con.update(table="VERIFY_TOKEN",
+            con.update(table="verify_token",
                        values=["expirated = '1'"],
                        where="token = '" + str(token)+"'")
             return {"status": "1", "message": "Password Updated"}
@@ -197,7 +242,7 @@ async def sendEmailVerification(request: Request):
         p3 = ''.join(random.choice(characters) for i in range(3))
         code = p1 + "-" + p2 + "-" + p3
         print(code)
-        status, res = con.select(table="VERIFY_EMAIL",
+        status, res = con.select(table="verify_email",
                                  where="token = '" + code + "'")
         if len(res) == 0:
             break
@@ -218,7 +263,7 @@ async def sendEmailVerification(request: Request):
     print(resource['type'])
     print(str(code))
     if not user == "":
-        status, msg = con.insert(table="VERIFY_EMAIL",
+        status, msg = con.insert(table="verify_email",
                                  fields="token, id_user, type, expiraton, expirated",
                                  values=[str(code), str(user), str(resource['type']), str(expiration_date), "0"])
         print(status,msg)
@@ -236,7 +281,7 @@ async def sendEmailVerification(request: Request):
 async def emailVerification(request: Request):
     resource = await request.json()
     token = resource['token']
-    status, res = con.select(table="VERIFY_EMAIL",
+    status, res = con.select(table="verify_email",
                              where="token = '" + token + "'")
     user = int(res[0][1])
     type = int(res[0][3])
@@ -255,7 +300,7 @@ async def emailVerification(request: Request):
                        where="id_alumn = " + str(user))
             exit = 1
         if exit == 1:
-            con.update(table="VERIFY_EMAIL",
+            con.update(table="verify_email",
                        values=["expirated = '1'"],
                        where="token = '" + str(token)+"'")
             return {"status": "1", "message": "Email verificated"}

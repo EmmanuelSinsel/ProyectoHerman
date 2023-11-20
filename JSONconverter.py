@@ -5,16 +5,13 @@ class JSONtoLIST:
 
     def insert(self, JSON):
         print(list(JSON.keys()))
-        keys = list(JSON.keys())
         ans = ""
-        for i in keys:
-            if(not i == "where"):
-                ans += i + ", "
-        ans = ans[:-2]
         values = []
         for key, value in JSON.items():
             if value is not None:
+                ans += key + ", "
                 values.append(value)
+        ans = ans[:-2]
         return ans, values
 
     def update(self,JSON):

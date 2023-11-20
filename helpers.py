@@ -1,5 +1,6 @@
 import requests
 from difflib import SequenceMatcher
+import json
 
 from manager import con
 #HELPERS
@@ -8,6 +9,10 @@ def repeated(table, field, value):
     status, msg = con.repeated(table=table,
                                where=sentence)
     return status
+
+def get_fields(table):
+    data = con.fields(table)
+    return data
 
 def get_book(isbn, title):
     if isbn == "":

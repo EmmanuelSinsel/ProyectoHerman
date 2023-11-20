@@ -1,109 +1,75 @@
+import helpers
 from main import converter
 from manager import con
-from helpers import repeated
 import models
-from fastapi import APIRouter, Request
-from typing import Any
-import pages.Auth as Auth
+from fastapi import APIRouter
 
 class CRUD:
     router = APIRouter()
-
-    apiName = ""
     table = ""
-    repeatedField = ""
-    enabled = ""
-
-    def __init__(self, Table: str, ApiName: str, RepeatedField: str, Enabled: str, Model: models):
-        self.table = Table
-        self.apiName = ApiName
-        self.repeatedField = RepeatedField
-        self.enabledMethods = Enabled
-        router = self.router
-
-        # I - INSERT
-        # R - INSERT NOT REPEATED
-        # U - UPDATE
-        # D - DELETE
-        # S - SELECT
-        # W - SELECT WHERE
-        # A - CREATE ACCOUNT
-        #
-        if "I" in Enabled:
-            @router.post("/api/insertNotRepeated_" + str(self.apiName) + "/")
-            async def insertNotRepeated(request: Model):
-                res = request.dict()
-                if (repeated(self.table, self.repeatedField, res[self.repeatedField]) == 1):
-                    fields, values = converter.insert(res)
-                    print(fields, values)
-                    status, msg = con.insert(table=Table,
-                                             fields=fields,
-                                             values=values)
-                    return {"message": msg, "status": status}
-                else:
-                    return {"message": "Email already registered", "status": 2}
-
-        if "R" in Enabled:
-            @router.post("/api/insert_" + str(self.apiName) + "/")
-            async def insert(request: Model):
-                res = request.dict()
-                fields, values = converter.insert(res)
-                status, msg = con.insert(table=self.table,
-                                         fields=fields,
-                                         values=values)
-                return {"message": msg, "status": status}
-
-        if "U" in Enabled:
-            @router.put("/api/update_" + str(self.apiName) + "/{updateValue}")
-            async def update(request: Model, updateValue: str):
-                res = request.dict()
-                values = converter.update(res)
-                status, msg = con.update(table=self.table,
-                                         values=values,
-                                         where=updateValue)
-                return {"message": msg, "status": status}
-
-        if "D" in Enabled:
-            @router.delete("/api/delete_" + str(self.apiName) + "/{where}")
-            def delete(where: str):
-                status, msg = con.update(table=self.table,
-                                         values=["state = 0"],
-                                         where=where)
-                return {"message": msg, "status": status}
-
-        if "S" in Enabled:
-            @router.get("/api/list_" + str(self.apiName) + "/{where}")
-            async def list(where: str):
-                status, res = con.select(table=self.table,
-                                         where=where)
-                return res
-
-        if "W" in Enabled:
-            @router.get("/api/list_" + str(self.apiName) + "/")
-            async def list():
-                status, res = con.select(table=self.table,
-                                         where="")
-                return res
-
+    def __init__(self, table: str, api_name: str, enabled, model: models):
+        self.table = table
+        self.router.tags = [api_name.capitalize()]
         # REGISTRAR USUARIOS
+        if "insert" in enabled:
+            self._insert(model, api_name, table)
 
-        if "A" in Enabled:
-            @router.post("/api/register_" + str(self.apiName))
-            async def insertAccount(request: Model):
-                data = await insertNotRepeated(request)
-                status = data['status']
-                msg = data['message']
-                print(status, msg)
-                if status == 1:
-                    # res = request.dict()
-                    # email = str(res['email'])
-                    # type = str(1)
-                    # status = Auth.sendEmailVerification(email,type)
-                    return {"message": msg, "status": status}
-                else:
-                    return {"message": "Email already registered", "status": 2}
+        if "update" in enabled:
+            self._update(model, api_name, table)
 
-class types:
-    isForeignKey: bool
-    isPrimaryKey: bool
-    autoIncremental: bool
+        if "delete" in enabled:
+            self._delete(api_name, table)
+
+        if "select" in enabled:
+            self._select(api_name, table)
+
+    def _insert(self, model, api_name, table):
+        @self.router.post("/api/insert_" + str(api_name) + "/")
+        async def insert(request: model):
+
+            res = request.dict()
+            print(res)
+            fields, values = converter.insert(res)
+            print(fields, values)
+            status, msg = con.insert(table=table,
+                                     fields=fields,
+                                     values=values)
+            return {"message": msg, "status": status}
+
+    def _update(self, model, api_name, table):
+        @self.router.put("/api/update_" + str(api_name) + "/{updateValue}")
+        async def update(request: model, updateValue: str):
+            res = request.dict()
+            values = converter.update(res)
+            status, msg = con.update(table=table,
+                                     values=values,
+                                     where=updateValue)
+            return {"message": msg, "status": status}
+
+    def _delete(self, api_name, table):
+        @self.router.delete("/api/delete_" + str(api_name) + "/{where}")
+        async def delete(where: str):
+            status, msg = con.update(table=table,
+                                     values=["state = 0"],
+                                     where=where)
+            return {"message": msg, "status": status}
+
+    def _select(self, api_name, table):
+        @self.router.get("/api/list_" + str(api_name) + "/{where}")
+
+        async def select(where: str):
+            fields = helpers.get_fields(self.table)
+            if where == "*":
+                where = ""
+            status, res = con.select(table=table,
+                                     where=where)
+            response = {}
+            res_list = list(res)
+            for i in range(len(res_list)):
+                data = {}
+                for j in range(len(fields)):
+                    data[fields[j]['Field']]=res_list[i][j]
+                response[str(i)]=data
+            return response
+
+

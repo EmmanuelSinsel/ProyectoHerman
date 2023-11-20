@@ -41,6 +41,8 @@ class SQLConnector:
         for i in values:
             if type(i) is str:
                 cursors += "%s, "
+            if type(i) is None:
+                cursors += "%s, "
             if type(i) is float:
                 cursors += "%f, "
             if type(i) is int:
@@ -54,9 +56,9 @@ class SQLConnector:
             self.cursor.execute(query, values)
             self.connection.commit()
             if self.cursor.rowcount >= 1:
-                return 1, "Succesful insert"
+                return 200, "Succesful insert"
             else:
-                return 0, "Error while inserting values"
+                return 400, "Error while inserting values"
         except Error as e:
             return 0, e
 
@@ -70,30 +72,35 @@ class SQLConnector:
         self.cursor.execute(query)
         self.connection.commit()
         if self.cursor.rowcount >= 1:
-            return 1, "Succesful update"
+            return 200, "Succesful update"
         else:
-            return 0, "Error while updating values"
+            return 400, "Error while updating values"
 
     #JALA AL 100
     def select(self, table, where):
+        print(where)
         if(not where == ""):
             query = "SELECT * FROM "+ table +" WHERE "+where
         else:
             query = "SELECT * FROM " + table
         print(query)
         self.cursor.execute(query)
-        return 1, self.cursor.fetchall()
-        #else:
-        #    return 0, "Error"
+        return 200, self.cursor.fetchall()
 
     #HELPERS
-
+    def fields(self, table):
+        query = "SHOW COLUMNS FROM "+table+";"
+        print(query)
+        self.cursor.execute(query)
+        columns = [column[0] for column in self.cursor.description]
+        data = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        return data
     def repeated(self, table, where):
         query = "SELECT COUNT(*) FROM "+ table +" WHERE "+where+""
         self.cursor.execute(query)
         result = self.cursor.fetchone()
         row_count = result[0]
         if(row_count > 0):
-            return 0, "Repeated" #REPEATED
+            return 200, "Repeated" #REPEATED
         if(row_count == 0):
-            return 1, "Not repeated" #NOT REPEATED
+            return 400, "Not repeated" #NOT REPEATED
