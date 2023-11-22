@@ -40,6 +40,7 @@ class CRUD:
         @self.router.put("/api/update_" + str(api_name) + "/{updateValue}")
         async def update(request: model, updateValue: str):
             res = request.dict()
+            print(res)
             values = converter.update(res)
             status, msg = con.update(table=table,
                                      values=values,

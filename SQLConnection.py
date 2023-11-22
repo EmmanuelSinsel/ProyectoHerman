@@ -69,6 +69,7 @@ class SQLConnector:
             sets += i+", "
         sets = sets[:-2]
         query = "UPDATE " + table + " SET " + sets + " WHERE "+ where
+        print(query)
         self.cursor.execute(query)
         self.connection.commit()
         if self.cursor.rowcount >= 1:
@@ -104,3 +105,7 @@ class SQLConnector:
             return 200, "Repeated" #REPEATED
         if(row_count == 0):
             return 400, "Not repeated" #NOT REPEATED
+
+    def custom(self, query):
+      self.cursor.execute(query)
+      return 200, self.cursor.fetchall()

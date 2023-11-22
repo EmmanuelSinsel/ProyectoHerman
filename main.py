@@ -97,6 +97,8 @@ Token = APIManager.CRUD(table="token",
 app.include_router(Admin.router)
 
 import pages.Auth as Auth
+import pages.Loans as Loans
+import pages.Reserves as Reserves
 
 
 # TRIGGER DE AUTENTICACION----------------------------------------------------------------------------------------------
@@ -176,6 +178,29 @@ async def sendEmailVerification(request: Request):
 async def verifyEmail(request: Request):
     return await Auth.emailVerification(request)
 
+
+# PRESTAMOS-------------------------------------------------------------------------------------------------------------
+@app.post("/api/get_full_loan", tags=["Loan"])
+async def get_full_loan(request: Request):
+  return await Loans.get_full_loan(request)
+
+@app.post("/api/register_loan", tags=["Loan"])
+async def register_loan(request: Request):
+  return await Loans.register_loan(request)
+
+@app.post("/api/update_loan", tags=["Loan"])
+async def update_loan(request: Request):
+  return await Loans.update_loan(request)
+
+@app.post("/api/get_book_data", tags=["Book"])
+async def get_book_data(request: Request):
+  return await Loans.get_book_data(request)
+
+# RESERVAS--------------------------------------------------------------------------------------------------------------
+
+@app.post("/api/get_full_reserve", tags=["Reserve"])
+async def get_full_loan(request: Request):
+  return await Reserves.get_full_reserves(request)
 
 # UTILITIES-------------------------------------------------------------------------------------------------------------
 @app.post("/api/search_book",tags=["Utilidad"])
