@@ -30,3 +30,6 @@ async def get_full_reserves(request: Request):
     }
     response[str(i)] = row
   return response
+
+async def deliver_book(request: Request):
+  pass
