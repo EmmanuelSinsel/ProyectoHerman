@@ -57,7 +57,6 @@ class CRUD:
 
     def _select(self, api_name, table):
         @self.router.get("/api/list_" + str(api_name) + "/{where}")
-
         async def select(where: str):
             fields = helpers.get_fields(self.table)
             if where == "*":

@@ -99,7 +99,7 @@ app.include_router(Admin.router)
 import pages.Auth as Auth
 import pages.Loans as Loans
 import pages.Reserves as Reserves
-
+import pages.Book as Books
 
 # TRIGGER DE AUTENTICACION----------------------------------------------------------------------------------------------
 @app.middleware("http")
@@ -201,6 +201,20 @@ async def get_book_data(request: Request):
 @app.post("/api/get_full_reserve", tags=["Reserve"])
 async def get_full_loan(request: Request):
   return await Reserves.get_full_reserves(request)
+
+# LIBROS----------------------------------------------------------------------------------------------------------------
+
+@app.post("/api/get_full_book", tags=["Book"])
+async def get_full_book(request: Request):
+  return await Books.get_full_book(request)
+
+@app.post("/api/register_book", tags=["Book"])
+async def register_loan(request: Request):
+  return await Books.register_book(request)
+
+@app.post("/api/update_book", tags=["Loan"])
+async def update_loan(request: Request):
+  return await Books.update_book(request)
 
 # UTILITIES-------------------------------------------------------------------------------------------------------------
 @app.post("/api/search_book",tags=["Utilidad"])

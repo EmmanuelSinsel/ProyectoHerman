@@ -45,6 +45,7 @@ async def register_loan(request: Request):
   id_alumn = ""
   id_book = ""
   id_library = ""
+  book_count = 0
   if len(res_admin) > 0:
     data = list(res_admin)
     id_library = data[0][0]
@@ -58,7 +59,8 @@ async def register_loan(request: Request):
   if len(res_book) > 0:
     data = list(res_book)
     id_book = data[0][0]
-    if data[0][5] == '0':
+    book_count = data[0][5]
+    if int(data[0][5]) == 0:
       return {"status": 403, "message": "Libro prestado"}
   else:
     return {"status": 402, "message": "Libro inexistente"}
@@ -66,10 +68,10 @@ async def register_loan(request: Request):
                            fields="id_alumn, id_book, date_transaction, date_deadline, notation, id_library, state",
                            values=[str(id_alumn), str(id_book), resource['date_transaction'], resource['date_deadline'],
                                    resource['notation'],str(id_library),resource['state']])
-  print(msg)
+  print("count:", book_count)
   status, msg = con.update(table="book",
                            values=[
-                                   "status = 0",
+                                   "status = "+str(int(book_count)-1),
                                    ],
                            where="id_book = '"+str(res_book[0][0])+"'")
   return {"status": 200, "message": "Registro exitoso"}
@@ -100,7 +102,7 @@ async def update_loan(request: Request):
   if len(res_book) > 0:
     data = list(res_book)
     id_book = data[0][0]
-    if data[0][5] == '0' and (not res_transaction[0][2] == res_book[0][0]):
+    if int(data[0][5]) == 0 and (not res_transaction[0][2] == res_book[0][0]):
       return {"status": 403, "message": "Libro prestado"}
   else:
     return {"status": 402, "message": "Libro inexistente"}
@@ -122,7 +124,7 @@ async def get_book_data(request: Request):
   status, res = con.custom("SELECT book.tittle, category.category, author.name, book.status, book.id_book FROM book "
                            "INNER JOIN category ON book.id_category = category.id_category "
                            "INNER JOIN author ON author.id_author = book.id_author WHERE isbn = '"+resource['isbn']+"'")
-
+  print(res)
   if len(res) > 0:
     response = {
       'title':res[0][0],
