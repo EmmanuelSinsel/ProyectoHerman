@@ -100,6 +100,7 @@ import pages.Auth as Auth
 import pages.Loans as Loans
 import pages.Reserves as Reserves
 import pages.Book as Books
+import pages.Advices as Advices
 
 # TRIGGER DE AUTENTICACION----------------------------------------------------------------------------------------------
 @app.middleware("http")
@@ -215,6 +216,16 @@ async def register_loan(request: Request):
 @app.post("/api/update_book", tags=["Loan"])
 async def update_loan(request: Request):
   return await Books.update_book(request)
+
+# OBSERVACIONES---------------------------------------------------------------------------------------------------------
+
+@app.post("/api/get_full_advice", tags=["Advice"])
+async def get_full_book(request: Request):
+  return await Advices.get_full_advice(request)
+
+@app.post("/api/register_advice", tags=["Advice"])
+async def register_loan(request: Request):
+  return await Advices.register_advice(request)
 
 # UTILITIES-------------------------------------------------------------------------------------------------------------
 @app.post("/api/search_book",tags=["Utilidad"])
