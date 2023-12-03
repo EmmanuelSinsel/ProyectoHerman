@@ -121,3 +121,9 @@ class Token(BaseModel):
     token: str | None = None
     expiration_date: str | None = None
     expired: str | None = None
+
+
+class Log(BaseModel):
+  id_log: str | None = None
+  user: str | None = None
+  log: str | None = None

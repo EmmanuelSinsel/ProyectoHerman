@@ -28,19 +28,19 @@ class CRUD:
         async def insert(request: model):
 
             res = request.dict()
-            print(res)
             fields, values = converter.insert(res)
-            print(fields, values)
             status, msg = con.insert(table=table,
                                      fields=fields,
                                      values=values)
+            con.insert(table="log",
+                       fields="")
             return {"message": msg, "status": status}
+
 
     def _update(self, model, api_name, table):
         @self.router.put("/api/update_" + str(api_name) + "/{updateValue}")
         async def update(request: model, updateValue: str):
             res = request.dict()
-            print(res)
             values = converter.update(res)
             status, msg = con.update(table=table,
                                      values=values,

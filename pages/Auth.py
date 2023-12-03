@@ -328,3 +328,17 @@ class emailSender:
            smtp_server.login(self.sender, self.password)
            smtp_server.sendmail(self.sender, recipients, msg.as_string())
         print("Message sent!")
+
+async def log(request: Request):
+  resource = await request.json()
+  status, res_token = con.custom(
+    "SELECT id_user FROM token WHERE token='" + resource['token'] + "'")
+  res_token = list(res_token)
+  status, res_admin = con.custom(
+    "SELECT user FROM admin WHERE id_admin = '" + str(res_token[0][0]) + "'")
+  res_admin = list(res_admin)
+  status, msg = con.insert(table="log",
+                           fields="user, log",
+                           values=[res_admin[0][0],resource['log']])
+  print(msg)
+  return {"status": 200, "message": "Registro exitoso"}

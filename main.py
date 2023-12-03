@@ -90,6 +90,12 @@ Transaction = APIManager.CRUD(table="transactions",
                               model=models.Transaction)
 app.include_router(Admin.router)
 
+Transaction = APIManager.CRUD(table="log",
+                              api_name="log",
+                              enabled=["select"],
+                              model=models.Log)
+app.include_router(Admin.router)
+
 Token = APIManager.CRUD(table="token",
                               api_name="token",
                               enabled=["select"],
@@ -101,6 +107,7 @@ import pages.Loans as Loans
 import pages.Reserves as Reserves
 import pages.Book as Books
 import pages.Advices as Advices
+import pages.Statistics as Statistics
 
 # TRIGGER DE AUTENTICACION----------------------------------------------------------------------------------------------
 @app.middleware("http")
@@ -237,3 +244,12 @@ async def search_book(request: models.GetBook):
 async def get_model(request: Request):
     res = await request.json()
     return get_fields(res['table'])
+
+@app.post("/api/log",tags=["Utilidad"])
+async def log(request: Request):
+    return await Auth.log(request)
+
+#STATISTICS-------------------------------------------------------------------------------------------------------------
+@app.get("/api/get_full_statistics",tags=["Estadisticas"])
+async def get_full_dashboard():
+    return await Statistics.get_full_dashboard()
