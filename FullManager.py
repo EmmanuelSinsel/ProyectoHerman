@@ -26,14 +26,12 @@ class CRUD:
     def _insert(self, model, api_name, table):
         @self.router.post("/api/insert_" + str(api_name) + "/")
         async def insert(request: model):
-
             res = request.dict()
             fields, values = converter.insert(res)
             status, msg = con.insert(table=table,
                                      fields=fields,
                                      values=values)
-            con.insert(table="log",
-                       fields="")
+            print(msg, status)
             return {"message": msg, "status": status}
 
 

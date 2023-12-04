@@ -20,8 +20,9 @@ async def get_full_dashboard():
   )
   status, res = con.custom(query)
   data = list(res)
-  response = {}
-  for i in range(1,13):
+  months = {}
+  categorias = {}
+  for i in range(1,13): #ESTADISTICAS POR MES / CATEGORIA
     month = {}
     for k in range(len(cats)):
       month[cats[k][0]]= {"id_category":cats[k][0],"category":cats[k][1], "count":0}
@@ -33,9 +34,19 @@ async def get_full_dashboard():
           "count": data[j][4]
         }
         month[data[j][2]] = cat
-    response[str(i)] = month
+    months[str(i)] = month
+  for k in range(len(cats)):
+    categorias[cats[k][0]] = {"id_category": cats[k][0], "category": cats[k][1], "count": 0}
+  print(data)
+  for i in range(1,13): #ESTADISTICAS POR MES / CATEGORIA
+    for j in range(len(data)):
+      if(int(data[j][1])==i):
+        print(categorias[cats[j][0]]['count'])
+        categorias[cats[j][0]]['count'] = data[j][4]
+  print(categorias)
   response = {
     "categories":cats,
-    "data":response
+    "data":months,
+    "cats":categorias
   }
   return response

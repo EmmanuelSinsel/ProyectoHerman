@@ -1,3 +1,4 @@
+import helpers
 from helpers import get_book, get_fields
 from typing import Annotated
 # PROCESADOR DE JSONS
@@ -116,7 +117,8 @@ async def Middleware(request: Request, call_next):
     base = str(request.base_url)
     url = str(request.url)
     excluded_urls = ["api/login", "api/password_recover", "api/password_reset", "api/verify_email", "api/send_email_verification",
-                     "api/password_token_verify", "api/authenticate"]
+                     "api/password_token_verify", "api/authenticate", "api/insert_alumn/", "api/send_email_verification",
+                     "api/verify_email"]
     if b'access-control-request-headers' in headers:
         response = await call_next(request)
         return response
@@ -126,6 +128,7 @@ async def Middleware(request: Request, call_next):
         response = await call_next(request)
         return response
     elif url in excluded_urls:
+        print("hola")
         headers = {"Access-Control-Allow-Origin": "*"}
         response = await call_next(request)
         return response
@@ -253,3 +256,9 @@ async def log(request: Request):
 @app.get("/api/get_full_statistics",tags=["Estadisticas"])
 async def get_full_dashboard():
     return await Statistics.get_full_dashboard()
+
+#ADMINISTRADORES--------------------------------------------------------------------------------------------------------
+
+@app.post("/api/get_admin_profile",tags=["Admin"])
+async def get_full_dashboard(request: Request):
+    return await helpers.get_admin_profile(request)

@@ -1,6 +1,7 @@
 import requests
 from difflib import SequenceMatcher
 import json
+from fastapi import Request
 
 from manager import con
 #HELPERS
@@ -62,3 +63,31 @@ def compute_similarity(input_string, reference_string):
     max_length = max(len(input_string), len(reference_string))
     similarity = 1 - (distance / max_length)
     return similarity
+
+
+async def get_admin_profile(request:Request):
+  res = await request.json()
+  print(res)
+  query = (
+    "SELECT id_user from token WHERE token = '"+res['token']+"'"
+  )
+  status, token = con.custom(query)
+  token = list(token)
+
+  query = (
+    "SELECT * from admin WHERE id_admin = '"+str(token[0][0])+"'"
+  )
+  status, admin = con.custom(query)
+  admin = list(admin)
+  admin_profile = {
+    "id":admin[0][0],
+    "user": admin[0][1],
+    "password": admin[0][2],
+    "first_name": admin[0][3],
+    "last_name": admin[0][4],
+    "phone": admin[0][5],
+    "email": admin[0][6],
+    "state": admin[0][7],
+    "library_id": admin[0][8],
+  }
+  return {"profile":admin_profile}

@@ -115,8 +115,9 @@ async def login(request: models.Login):
     elif user_type == "0":  # LOGIN ALUMN
         status, res = con.select(table="alumn",
                                  where="email = '"+email+"'")
-        if(status == 1):
-            if res[0][2] == resource['password']:
+        print(res, status)
+        if(len(res)>=1):
+            if res[0][3] == resource['password']:
                 return generate_token(res[0][0], user_type)
             else:
                 return {"status": "0", "msg": "Wrong password", "token": ""}
@@ -241,7 +242,6 @@ async def sendEmailVerification(request: Request):
         p2 = ''.join(random.choice(characters) for i in range(3))
         p3 = ''.join(random.choice(characters) for i in range(3))
         code = p1 + "-" + p2 + "-" + p3
-        print(code)
         status, res = con.select(table="verify_email",
                                  where="token = '" + code + "'")
         if len(res) == 0:
@@ -250,7 +250,6 @@ async def sendEmailVerification(request: Request):
     if resource['type'] == "1": #ADMIN
         status, res = con.select(table="admin",
                                  where="email = '" + resource['email'] + "'")
-        print(res)
         user = res[0][0]
     if resource['type'] == "0": #ALUMN
         status, res = con.select(table="alumn",
@@ -258,16 +257,12 @@ async def sendEmailVerification(request: Request):
         user = res[0][0]
 
     expiration_date = datetime.datetime.now() + timedelta(minutes=30)
-    print(expiration_date)
-    print(user)
-    print(resource['type'])
-    print(str(code))
     if not user == "":
         status, msg = con.insert(table="verify_email",
                                  fields="token, id_user, type, expiraton, expirated",
                                  values=[str(code), str(user), str(resource['type']), str(expiration_date), "0"])
         print(status,msg)
-        if status == 1:
+        if status == 200:
             sender.sendEmail(subject="VERIFICACION DE CORREO",
                              recipients=[resource['email']],
                              file="pages/assets/verify.html",
@@ -285,8 +280,6 @@ async def emailVerification(request: Request):
                              where="token = '" + token + "'")
     user = int(res[0][1])
     type = int(res[0][3])
-    print(user)
-    print(type)
     exit = 0
     if int(res[0][5])==0:
         if type == 1: #ADMIN
@@ -296,7 +289,7 @@ async def emailVerification(request: Request):
             exit = 1
         if type == 0: #ALUMN
             con.update(table="alumn",
-                       values=["password = '1'"],
+                       values=["state = '1'"],
                        where="id_alumn = " + str(user))
             exit = 1
         if exit == 1:

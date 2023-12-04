@@ -119,6 +119,7 @@ async def update_book(request: Request):
                                    "isbn = '"+str(resource['isbn'])+"'",
                                    "id_category = '"+str(id_category)+"'",
                                    "id_author = '"+str(id_author)+"'",
+                                   "status = '"+str(resource['status'])+"'"
                                    ],
                            where="id_book = '"+str(resource['where'])+"'")
   return {"status": 200, "message": "Registro exitoso"}
