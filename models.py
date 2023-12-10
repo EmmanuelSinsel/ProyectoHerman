@@ -33,7 +33,7 @@ class Admin(BaseModel):
     email: str | None = None
     state: str | None = None
     library_id: str | None = None
-
+    master: str | None = None
 
 class Alumn(BaseModel):
     account_number: str | None = None

@@ -10,12 +10,13 @@ async def get_full_reserves(request: Request):
       "SELECT reserves.id_reserve,alumn.account_number, book.isbn, book.tittle, reserves.date_pickup, "
       "reserves.state FROM reserves INNER JOIN book "
       "ON reserves.id_book = book.id_book INNER JOIN alumn ON reserves.id_alumn = alumn.id_alumn "
-      "WHERE alumn.account_number = '"+where+"'")
+      "WHERE "+where)
   else:
     query = (
       "SELECT reserves.id_reserve,alumn.account_number, book.isbn, book.tittle, reserves.date_pickup, "
       "reserves.state FROM reserves INNER JOIN book "
       "ON reserves.id_book = book.id_book INNER JOIN alumn ON reserves.id_alumn = alumn.id_alumn")
+  print(query)
   status, res = con.custom(query)
   data = list(res)
   response = {}

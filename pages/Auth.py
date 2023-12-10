@@ -90,6 +90,15 @@ async def authenticate_self(request: Request):
         if res[0][5] == "1":
             return {"status": "0", "msg": "Expired Token"}
 
+
+async def get_token_data(request: Request):
+  resource = await request.json()
+  token = resource['token']
+  status, res_token = con.select(table="token",
+                           where="token = '" + token + "'")
+  status, res_alumn = con.select(table="alumn",
+                           where="id_alumn = '" + str(res_token[0][1]) + "'")
+  return {"id":res_token[0][1], "library":res_alumn[0][12], "account":res_alumn[0][1]}
 # AUTHENTICATION
 async def login(request: models.Login):
     resource = request.dict()

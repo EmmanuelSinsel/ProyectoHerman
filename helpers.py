@@ -89,5 +89,37 @@ async def get_admin_profile(request:Request):
     "email": admin[0][6],
     "state": admin[0][7],
     "library_id": admin[0][8],
+    "master":admin[0][9]
   }
   return {"profile":admin_profile}
+
+async def get_alumn_profile(request:Request):
+  res = await request.json()
+  print(res)
+  query = (
+    "SELECT id_user from token WHERE token = '"+res['token']+"'"
+  )
+  status, token = con.custom(query)
+  token = list(token)
+
+  query = (
+    "SELECT * from alumn WHERE id_alumn = '"+str(token[0][0])+"'"
+  )
+  status, alumn = con.custom(query)
+  alumn = list(alumn)
+  alumn_profile = {
+    "id":alumn[0][0],
+    "account_number": alumn[0][1],
+    "user": alumn[0][2],
+    "password":alumn[0][3],
+    "school_group": alumn[0][4],
+    "carreer": alumn[0][5],
+    "first_name": alumn[0][6],
+    "last_name": alumn[0][7],
+    "phone": alumn[0][8],
+    "email": alumn[0][9],
+    "last_preference": alumn[0][10],
+    "state": alumn[0][11],
+    "library_id": alumn[0][12]
+  }
+  return {"profile":alumn_profile}

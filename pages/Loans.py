@@ -1,6 +1,6 @@
 from fastapi import Request
 from manager import con
-
+from pages.Auth import emailSender
 
 async def get_full_loan(request: Request):
   res = await request.json()
@@ -11,12 +11,14 @@ async def get_full_loan(request: Request):
       "SELECT transactions.id_transaction,alumn.account_number, book.isbn, book.tittle, transactions.date_transaction, "
       "transactions.date_deadline, transactions.date_return FROM transactions INNER JOIN book "
       "ON transactions.id_book = book.id_book INNER JOIN alumn ON transactions.id_alumn = alumn.id_alumn "
-      "WHERE alumn.account_number = '"+where+"'")
+      "WHERE "+where)
   else:
     query = (
       "SELECT transactions.id_transaction,alumn.account_number, book.isbn, book.tittle,transactions.date_transaction, "
       "transactions.date_deadline, transactions.date_return FROM transactions INNER JOIN book "
       "ON transactions.id_book = book.id_book INNER JOIN alumn ON transactions.id_alumn = alumn.id_alumn")
+
+  print(query)
   status, res = con.custom(query)
   data = list(res)
   response = {}
@@ -135,4 +137,14 @@ async def get_book_data(request: Request):
     }
     return {"0":response}
   return {"status": 402, "message": "Libro inexistente"}
+
+
+async def send_return_mail(request: Request):
+  resource = await request.json()
+  code = resource['title']
+  sender = emailSender(sender="therealchalinosanchez@gmail.com", password="mlta vekc irlj exls")
+  sender.sendEmail(subject="VERIFICACION DE CORREO",
+                   recipients=[resource['email']],
+                   file="pages/assets/return.html",
+                   code=code)
 

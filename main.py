@@ -158,6 +158,9 @@ async def Middleware(request: Request, call_next):
 async def login(request: models.Login):
     return await Auth.login(request)
 
+@app.post("/api/get_token_data", tags=["Authorization"])
+async def get_token_data(request: Request):
+    return await Auth.get_token_data(request)
 
 @app.post("/api/logout",tags=["Authorization"])
 async def logout(request: Request):
@@ -206,6 +209,11 @@ async def update_loan(request: Request):
 @app.post("/api/get_book_data", tags=["Book"])
 async def get_book_data(request: Request):
   return await Loans.get_book_data(request)
+
+@app.post("/api/send_return_mail", tags=["Loan"])
+async def get_book_data(request: Request):
+  return await Loans.send_return_mail(request)
+
 
 # RESERVAS--------------------------------------------------------------------------------------------------------------
 
@@ -262,3 +270,7 @@ async def get_full_dashboard():
 @app.post("/api/get_admin_profile",tags=["Admin"])
 async def get_full_dashboard(request: Request):
     return await helpers.get_admin_profile(request)
+
+@app.post("/api/get_alumn_profile",tags=["Admin"])
+async def get_full_dashboard(request: Request):
+    return await helpers.get_alumn_profile(request)

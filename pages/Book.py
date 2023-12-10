@@ -9,7 +9,7 @@ async def get_full_book(request: Request):
   query = ("SELECT book.id_book, book.tittle, book.isbn, category.category, author.name, book.status "
            "FROM book INNER JOIN category ON category.id_category = book.id_category "
            "INNER JOIN author ON author.id_author = book.id_author ")
-  if(res['author'] != "*" or res["category"] != "*" or res["title"] != "*" or res["isbn"] != "*"):
+  if(res['author'] != "*" or res["category"] != "*" or res["title"] != "*" or res["isbn"] != "*" or res["library"] != "*"):
     query += "WHERE "
     if(res['author'] != "*"):
       if(arg_count>0):query+=" AND "
@@ -26,6 +26,10 @@ async def get_full_book(request: Request):
     if(res['isbn'] != "*"):
       if(arg_count>0):query+=" AND "
       query += "book.isbn LIKE '"+res['isbn']+"%'"
+      arg_count += 1
+    if(res['library'] != "*"):
+      if(arg_count>0):query+=" AND "
+      query += "book.id_library = '"+res['library']+"'"
       arg_count += 1
   if(arg_count == 0):
     query += "WHERE book.state = '1'"
