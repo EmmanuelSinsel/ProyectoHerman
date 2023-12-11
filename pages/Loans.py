@@ -61,6 +61,14 @@ async def register_loan(request: Request):
   if len(res_alumn) > 0:
     data = list(res_alumn)
     id_alumn = data[0][0]
+    today = parse(str(date.today()))
+    if(parse(str(data[0][13]))!= None):
+      if(parse(str(data[0][13]))>today):
+        return {"status": 401, "message": "El Alumno tiene una penalizacion hasta el dia: "+str(data[0][13])}
+      else:
+        status, msg = con.update(table="alumn",
+                                 values=["timeout = NULL", ],
+                                 where="id_alumn = '" + str(resource['alumn']) + "'")
   else:
     return {"status": 401, "message": "Alumno inexistente"}
   if len(res_book) > 0:
@@ -104,14 +112,6 @@ async def update_loan(request: Request):
   if len(res_alumn) > 0:
     data = list(res_alumn)
     id_alumn = data[0][0]
-    today = parse(str(date.today()))
-    if(parse(str(data[0][13]))!= None):
-      if(parse(str(data[0][13]))>today):
-        return {"status": 401, "message": "El Alumno tiene una penalizacion hasta el dia: "+str(data[0][13])}
-      else:
-        status, msg = con.update(table="alumn",
-                                 values=["timeout = NULL", ],
-                                 where="id_alumn = '" + str(resource['alumn']) + "'")
   else:
     return {"status": 401, "message": "Alumno inexistente"}
   if len(res_book) > 0:
