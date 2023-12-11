@@ -1,6 +1,9 @@
+from datetime import timedelta, date
+
 from fastapi import Request
 from manager import con
 from pages.Auth import emailSender
+from dateutil.parser import parse
 
 async def get_full_loan(request: Request):
   res = await request.json()
@@ -9,18 +12,19 @@ async def get_full_loan(request: Request):
   if not where == "*":
     query = (
       "SELECT transactions.id_transaction,alumn.account_number, book.isbn, book.tittle, transactions.date_transaction, "
-      "transactions.date_deadline, transactions.date_return FROM transactions INNER JOIN book "
+      "transactions.date_deadline, transactions.date_return, transactions.notation FROM transactions INNER JOIN book "
       "ON transactions.id_book = book.id_book INNER JOIN alumn ON transactions.id_alumn = alumn.id_alumn "
-      "WHERE "+where)
+      "WHERE "+where+" ORDER BY transactions.id_transaction")
   else:
     query = (
       "SELECT transactions.id_transaction,alumn.account_number, book.isbn, book.tittle,transactions.date_transaction, "
-      "transactions.date_deadline, transactions.date_return FROM transactions INNER JOIN book "
-      "ON transactions.id_book = book.id_book INNER JOIN alumn ON transactions.id_alumn = alumn.id_alumn")
+      "transactions.date_deadline, transactions.date_return, transactions.notation FROM transactions INNER JOIN book "
+      "ON transactions.id_book = book.id_book INNER JOIN alumn ON transactions.id_alumn = alumn.id_alumn ORDER BY transactions.id_transaction")
 
   print(query)
   status, res = con.custom(query)
   data = list(res)
+  print(data)
   response = {}
   for i in range(len(data)):
     row = {
@@ -30,7 +34,8 @@ async def get_full_loan(request: Request):
       'book': data[i][3],
       'date_transaction': data[i][4],
       'date_deadline': data[i][5],
-      'date_return': data[i][6]
+      'date_return': data[i][6],
+      'notation': data[i][7]
     }
     response[str(i)] = row
   return response
@@ -99,6 +104,14 @@ async def update_loan(request: Request):
   if len(res_alumn) > 0:
     data = list(res_alumn)
     id_alumn = data[0][0]
+    today = parse(str(date.today()))
+    if(parse(str(data[0][13]))!= None):
+      if(parse(str(data[0][13]))>today):
+        return {"status": 401, "message": "El Alumno tiene una penalizacion hasta el dia: "+str(data[0][13])}
+      else:
+        status, msg = con.update(table="alumn",
+                                 values=["timeout = NULL", ],
+                                 where="id_alumn = '" + str(resource['alumn']) + "'")
   else:
     return {"status": 401, "message": "Alumno inexistente"}
   if len(res_book) > 0:
@@ -120,6 +133,19 @@ async def update_loan(request: Request):
                                    ],
                            where="id_transaction = '"+str(resource['where'])+"'")
   return {"status": 200, "message": "Registro exitoso"}
+
+async def check_timeout(request: Request):
+  resource = await request.json()
+  date = parse(str(resource['date']))
+  today = parse(str(date.today()))
+  if(today>date):
+    expiration_date = date.today() + timedelta(days=7)
+    status, msg = con.update(table="alumn",
+                             values=["timeout = '" + str(expiration_date) + "'",],
+                             where="id_alumn = '" + str(resource['alumn']) + "'")
+    return {"status":"1", "message":msg}
+  else:
+    return {"status":"0","message":"No timeout"}
 
 async def get_book_data(request: Request):
   resource = await request.json()

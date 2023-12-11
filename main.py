@@ -271,6 +271,10 @@ async def get_full_dashboard():
 async def get_full_dashboard(request: Request):
     return await helpers.get_admin_profile(request)
 
-@app.post("/api/get_alumn_profile",tags=["Admin"])
+@app.post("/api/get_alumn_profile",tags=["Alumn"])
 async def get_full_dashboard(request: Request):
     return await helpers.get_alumn_profile(request)
+
+@app.post("/api/check_timeout",tags=["Loans"])
+async def check_timeout(request: Request):
+    return await Loans.check_timeout(request)
