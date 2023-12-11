@@ -118,7 +118,7 @@ async def Middleware(request: Request, call_next):
     url = str(request.url)
     excluded_urls = ["api/login", "api/password_recover", "api/password_reset", "api/verify_email", "api/send_email_verification",
                      "api/password_token_verify", "api/authenticate", "api/insert_alumn/", "api/send_email_verification",
-                     "api/verify_email"]
+                     "api/verify_email", "api/log"]
     if b'access-control-request-headers' in headers:
         response = await call_next(request)
         return response

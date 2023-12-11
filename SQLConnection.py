@@ -3,8 +3,8 @@ import datetime
 import mysql
 from mysql.connector import Error
 class SQLConnector:
-    connection = mysql.connector
-    cursor: None
+    con = None
+    cur = None
     SQL_HOST = ""
     SQL_DB = ""
     SQL_PORT = ""
@@ -19,19 +19,20 @@ class SQLConnector:
         self.SQL_PASSWORD = password
 
     def connect(self):
-        self.connection = mysql.connector.connect(
+        self.con = mysql.connector.connect(
             host=self.SQL_HOST,
             user=self.SQL_USER,
             password=self.SQL_PASSWORD,
             database=self.SQL_DB
         )
-        self.cursor = self.connection.cursor()
+        self.cur = self.con.cursor()
+
     #JALA AL 100
     def delete(self, table, where):
         query = "DELETE FROM "+ table +" WHERE " + where
-        self.cursor.execute(query)
-        self.connection.commit()
-        if self.cursor.rowcount >= 1:
+        self.con.cursor.execute(query)
+        self.con.commit()
+        if self.con.cursor.rowcount >= 1:
             return 1, "Succesful delete"
         else:
             return 0, "Error while deleting values"
@@ -52,54 +53,49 @@ class SQLConnector:
         cursors = cursors[:-2]
         try:
             query = "INSERT INTO " + table + " (" + fields + ") VALUES (" + cursors + ")"
-            print(query)
-            self.cursor.execute(query, values)
-            self.connection.commit()
-            if self.cursor.rowcount >= 1:
-                return 200, "Succesful insert"
+            self.cur.execute(query, values)
+            self.con.commit()
+            if self.cur.rowcount >= 1:
+              return 200, "Succesful insert"
             else:
-                return 400, "Error while inserting values"
+              return 400, "Error while inserting values"
         except Error as e:
-            return 0, e
+          return 0, e
 
     #JALA Al 100
     def update(self, table, values, where):
-        sets = ""
-        for i in values:
-            sets += i+", "
-        sets = sets[:-2]
-        query = "UPDATE " + table + " SET " + sets + " WHERE "+ where
-        print(query)
-        self.cursor.execute(query)
-        self.connection.commit()
-        if self.cursor.rowcount >= 1:
-            return 200, "Succesful update"
-        else:
-            return 400, "Error while updating values"
+      sets = ""
+      for i in values:
+        sets += i+", "
+      sets = sets[:-2]
+      query = "UPDATE " + table + " SET " + sets + " WHERE "+ where
+      self.cur.execute(query)
+      self.con.commit()
+      if self.cur.rowcount >= 1:
+        return 200, "Succesful update"
+      else:
+        return 400, "Error while updating values"
 
     #JALA AL 100
     def select(self, table, where):
-        print(where)
-        if(not where == ""):
-            query = "SELECT * FROM "+ table +" WHERE "+where
-        else:
-            query = "SELECT * FROM " + table
-        print(query)
-        self.cursor.execute(query)
-        return 200, self.cursor.fetchall()
+      if(not where == ""):
+          query = "SELECT * FROM "+ table +" WHERE "+where
+      else:
+          query = "SELECT * FROM " + table
+      self.cur.execute(query)
+      return 200, self.cur.fetchall()
 
     #HELPERS
     def fields(self, table):
         query = "SHOW COLUMNS FROM "+table+";"
-        print(query)
-        self.cursor.execute(query)
-        columns = [column[0] for column in self.cursor.description]
-        data = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        self.cur.execute(query)
+        columns = [column[0] for column in self.cur.description]
+        data = [dict(zip(columns, row)) for row in self.cur.fetchall()]
         return data
     def repeated(self, table, where):
         query = "SELECT COUNT(*) FROM "+ table +" WHERE "+where+""
-        self.cursor.execute(query)
-        result = self.cursor.fetchone()
+        self.cur.execute(query)
+        result = self.cur.fetchone()
         row_count = result[0]
         if(row_count > 0):
             return 200, "Repeated" #REPEATED
@@ -107,5 +103,5 @@ class SQLConnector:
             return 400, "Not repeated" #NOT REPEATED
 
     def custom(self, query):
-      self.cursor.execute(query)
-      return 200, self.cursor.fetchall()
+      self.cur.execute(query)
+      return 200, self.cur.fetchall()
